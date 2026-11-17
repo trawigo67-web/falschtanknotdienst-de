@@ -19,9 +19,26 @@ FAVICON = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect 
 def strip(s):
     return re.sub(r"\s+", " ", htmlmod.unescape(re.sub(r"<[^>]+>", "", s))).strip()
 
+ALWAYS = ("sign", "sign-hi", "sign-lo", "sign-muted", "board", "foot-a", "foot-b", "signal", "signal-hi", "signal-lo", "signal-press", "on-signal")
+LIGHT = ("brand-ab", "link", "tint", "paper", "line", "line-strong", "muted", "ink")
+
+def theme_css(themes):
+    """Farbthemen: <html data-theme="..."> wählt eines. Petrol ist der Grundzustand in :root."""
+    out = []
+    for key, t in themes.items():
+        if key == "petrol":
+            continue
+        sel = 'html[data-theme="%s"]' % key
+        out.append(sel + "{" + "".join("--%s:%s;" % (v, t[v]) for v in ALWAYS) + "}")
+        out.append("@media (prefers-color-scheme:light){" + sel + "{" + "".join("--%s:%s;" % (v, t[v]) for v in LIGHT) + "}}")
+        out.append("@media (prefers-color-scheme:dark){" + sel + "{--brand-ab:%s;--link:%s}}" % (t["brand-ab-dark"], t["signal-hi"]))
+    return "\n".join(out)
+
 def build(cfg, mode, out):
     page = (ROOT / "src/index.html").read_text(encoding="utf-8")
     css = (ROOT / "src/style.css").read_text(encoding="utf-8").replace("/*DARK*/", DARK)
+    themes = json.loads((ROOT / "src/themes.json").read_text(encoding="utf-8"))
+    css += "\n" + theme_css(themes)
     if cfg.get("brandVw"):
         css = css.replace("  --brand-ab:#E36C00;", "  --brand-ab:#E36C00;\n  --brand-vw:%s;" % cfg["brandVw"], 1)
     strings = (ROOT / "src/strings.js").read_text(encoding="utf-8")
@@ -36,6 +53,12 @@ def build(cfg, mode, out):
         app = re.sub(r"\n\s*window\.__tank = .*?;\n", "\n", app)
     page = page.replace("/*CSS*/", css).replace("/*JS*/", strings + "\n" + geo + "\n" + app)
 
+    theme = cfg.get("theme", "petrol")
+    tfile = out / "theme.txt"
+    if tfile.exists():
+        theme = tfile.read_text(encoding="utf-8").strip() or theme  # im Admin-Bereich gewählt, bleibt beim Neubau erhalten
+    if theme not in themes:
+        theme = "petrol"
     url = "https://" + cfg["domain"] + "/"
     canon = cfg.get("canonical", url)
     display = cfg.get("display", cfg["brand"] + cfg["tld"])
@@ -45,6 +68,7 @@ def build(cfg, mode, out):
         "CANONICAL": '<link rel="canonical" href="%s">' % canon if mode == "site" else "",
         "OGURL": '<meta property="og:url" content="%s">' % url if mode == "site" else "",
         "OGIMAGE": ('<meta property="og:image" content="%sog.png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta name="twitter:card" content="summary_large_image">' % url) if mode == "site" else "",
+        "THEME": theme,
         "BRAND": cfg["brand"], "TLD": cfg["tld"], "BRAND_HTML": cfg["brandHtml"], "DISPLAY": display,
         "ALIAS": cfg.get("alias", ""),
         "FAVICON": "data:image/svg+xml," + urllib.parse.quote(FAVICON, safe="/:=' ,()-."),
@@ -118,6 +142,15 @@ def build(cfg, mode, out):
                           {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]}
     (out / "site.webmanifest").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     (out / "index.html").write_text(page, encoding="utf-8")
+    # Admin-Bereich: Farbthema wählen (nicht für Suchmaschinen)
+    adm = (ROOT / "src/admin.html").read_text(encoding="utf-8")
+    repos = cfg.get("adminRepos", [])
+    own = "trawigo67-web/" + cfg["domain"].replace(".", "-")
+    adm = (adm.replace("{{THEMES_JSON}}", json.dumps(themes, ensure_ascii=False))
+              .replace("{{REPOS_JSON}}", json.dumps(repos)).replace("{{OWN_REPO}}", json.dumps(own if own in repos else (repos[0] if repos else own)))
+              .replace("{{DISPLAY}}", htmlmod.escape(display)))
+    (out / "admin").mkdir(exist_ok=True)
+    (out / "admin" / "index.html").write_text(adm, encoding="utf-8")
     # Sprachpakete, die erst bei Bedarf geladen werden
     (out / "lang").mkdir(exist_ok=True)
     for code, text in packs.items():
@@ -132,7 +165,8 @@ def build(cfg, mode, out):
     if mode == "site":
         (out / "CNAME").write_text(cfg["domain"] + "\n", encoding="utf-8")
         (out / ".nojekyll").write_text("", encoding="utf-8")
-        (out / "robots.txt").write_text("User-agent: *\nAllow: /\n\nSitemap: %ssitemap.xml\n" % url, encoding="utf-8")
+        (out / "theme.txt").write_text(theme + "\n", encoding="utf-8")
+        (out / "robots.txt").write_text("User-agent: *\nAllow: /\nDisallow: /admin/\n\nSitemap: %ssitemap.xml\n" % url, encoding="utf-8")
         (out / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>%s</loc></url>\n</urlset>\n' % url, encoding="utf-8")
         nf = (ROOT / "src/404.html").read_text(encoding="utf-8")
         for k, v in rep.items():

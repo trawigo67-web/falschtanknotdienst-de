@@ -149,6 +149,12 @@
   var FRAMED = (function () { try { return window.self !== window.top; } catch (e) { return true; } })();
   var GEO_OK = !!navigator.geolocation && window.isSecureContext !== false && !FRAMED; /* eingebettet (Vorschau) sperrt der Browser die Abfrage */
   if (!GEO_OK) { root.classList.add('no-geo'); }
+  /* Farbe der Browserleiste folgt dem gewählten Farbthema */
+  (function () {
+    var tc = doc.querySelector('meta[name="theme-color"][media*="light"]');
+    var light = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    if (tc && light) { var p = getComputedStyle(root).getPropertyValue('--paper').trim(); if (p) { tc.setAttribute('content', p); } }
+  })();
   function setRegion(r) { if (r === 'west' || r === 'by' || r === 'rm') { region = r; } }
   function soonAt(lat, lon) {
     var hit = null;

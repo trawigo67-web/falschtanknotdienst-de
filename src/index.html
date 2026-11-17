@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" class="no-js">
+<html lang="de" class="no-js" data-theme="{{THEME}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -22,7 +22,7 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="fonts/ssc-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/ss-latin.woff2" as="font" type="font/woff2" crossorigin>
-<script>document.documentElement.classList.remove('no-js');</script>
+<script>(function(d){d.classList.remove('no-js');var m=/[?&]theme=([a-z]+)/.exec(location.search);if(m){d.setAttribute('data-theme',m[1]);}})(document.documentElement);</script>
 <style>
 /*CSS*/
 </style>
@@ -60,11 +60,11 @@
     <symbol id="f-uk" viewBox="0 0 24 16"><rect width="24" height="16" fill="#FFD700"/><rect width="24" height="8" fill="#0057B7"/></symbol>
     <symbol id="f-pl" viewBox="0 0 24 16"><rect width="24" height="16" fill="#DC143C"/><rect width="24" height="8" fill="#fff"/></symbol>
     <symbol id="f-ro" viewBox="0 0 24 16"><rect width="24" height="16" fill="#CE1126"/><rect width="16" height="16" fill="#FCD116"/><rect width="8" height="16" fill="#002B7F"/></symbol>
-    <linearGradient id="lg-tile" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#11636F"/><stop offset="1" stop-color="#06323B"/></linearGradient>
+    <linearGradient id="lg-tile" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--sign-hi)"/><stop offset="1" style="stop-color:var(--sign-lo)"/></linearGradient>
     <!-- Markenzeichen: Zapfpistole, deren Schlauch zum Rückpfeil wird -->
     <symbol id="g-brand" viewBox="0 0 200 200"><g transform="translate(100 100) scale(.9) translate(-113 -125)">
-      <path d="M139 50A64 64 0 0 1 87.800 166.900" fill="none" stroke="#FF8A1F" stroke-width="15" stroke-linecap="round"/>
-      <path d="M98.400 144 53.600 155.800 83 191.600z" fill="#FF8A1F"/>
+      <path d="M139 50A64 64 0 0 1 87.800 166.900" fill="none" style="stroke:var(--signal)" stroke-width="15" stroke-linecap="round"/>
+      <path d="M98.400 144 53.600 155.800 83 191.600z" style="fill:var(--signal)"/>
       <g transform="translate(-6 -9) rotate(-24 108 92)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
         <rect x="82" y="60" width="66" height="36" rx="11" fill="currentColor" stroke="none"/>
         <rect x="141" y="65" width="17" height="26" rx="6" fill="currentColor" stroke="none"/>
