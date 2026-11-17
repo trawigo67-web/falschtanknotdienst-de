@@ -8,7 +8,7 @@
 <meta name="robots" content="{{ROBOTS}}">
 {{CANONICAL}}
 <meta name="format-detection" content="telephone=no">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#EEF3F2">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F2F5F5">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#051A1E">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="de_DE">
@@ -43,6 +43,7 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.500 4.500 4.500L19 7.500"/></symbol>
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9.500 6 6 6-6"/></symbol>
     <symbol id="i-back" viewBox="0 0 24 24"><path d="M11 5l-7 7 7 7M4 12h16"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.500"/><path d="M12 2.500v3M12 18.500v3M2.500 12h3M18.500 12h3"/><circle cx="12" cy="12" r="1.700" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.700 5.600 6.100.800-4.500 4.300 1.100 6.100L12 16.900 6.600 19.800l1.100-6.100L3.200 9.400l6.100-.800z"/></symbol>
     <linearGradient id="lg-tile" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#11636F"/><stop offset="1" stop-color="#06323B"/></linearGradient>
     <!-- Markenzeichen: Zapfpistole, deren Schlauch zum Rückpfeil wird -->
@@ -103,26 +104,35 @@
       </div>
       <div class="sign-copy">
         <h1 id="hero-h" data-i18n="hero.h1">Falsch getankt?<br>Motor aus lassen.</h1>
-        <p class="lead" data-i18n="hero.lead">Wir kommen zu Ihnen, pumpen den falschen Kraftstoff ab und spülen Tank und Leitungen. In den meisten Fällen fahren Sie danach einfach weiter.</p>
+        <p class="lead" data-i18n="hero.lead">Wir kommen zu Ihnen, pumpen den falschen Kraftstoff ab und spülen Tank und Leitungen.<span class="lead-more"> In den meisten Fällen fahren Sie danach einfach weiter.</span></p>
       </div>
       <div class="callpanel" id="callpanel">
+        <div class="locator">
+          <button type="button" class="loc-btn" data-locate>
+            <span class="loc-ico" aria-hidden="true"><svg class="ico"><use href="#i-target"/></svg></span>
+            <span class="loc-text"><span class="loc-title" data-i18n="loc.btn">Standort freigeben</span><span class="loc-sub" data-i18n="loc.sub">Wir verbinden Sie mit dem richtigen Einsatzteam</span></span>
+            <svg class="ico loc-go" aria-hidden="true"><use href="#i-chev"/></svg>
+          </button>
+          <p class="loc-status" role="status" hidden></p>
+        </div>
         <a class="btn-call" href="tel:{{WEST_TEL}}" data-region="west">
-          <svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg>
-          <span class="btn-call-text"><span class="num">{{WEST_NUM}}</span><span class="where" data-i18n="region.west">NRW, Hessen, Rheinland-Pfalz</span></span>
+          <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
+          <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{WEST_NUM}}</span><span class="where" data-i18n="region.west">NRW, Hessen, Rheinland-Pfalz</span></span>
         </a>
         <a class="btn-call" href="tel:{{BY_TEL}}" data-region="by">
-          <svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg>
-          <span class="btn-call-text"><span class="num">{{BY_NUM}}</span><span class="where" data-i18n="region.by">Bayern</span></span>
+          <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
+          <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{BY_NUM}}</span><span class="where" data-i18n="region.by">Bayern</span></span>
         </a>
         <div class="callpanel-more">
-          <a class="btn btn-wa" href="https://wa.me/{{WEST_WA}}?text={{WA_TEXT}}" data-open-sheet="wa" rel="noopener">
+          <a class="btn btn-ghost btn-wa-ghost" href="https://wa.me/{{WEST_WA}}?text={{WA_TEXT}}" data-open-sheet="wa" rel="noopener">
             <svg class="ico" aria-hidden="true"><use href="#i-bubble"/></svg><span data-i18n="cta.wa">WhatsApp</span>
           </a>
           <button type="button" class="btn btn-ghost" data-open-chat>
-            <svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg><span data-i18n="cta.chat">Chat starten</span>
+            <svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg><span data-i18n="cta.chat">Chat<span class="lbl-more"> starten</span></span>
           </button>
         </div>
         <p class="callpanel-note" data-i18n="hero.note">Den Festpreis nennen wir Ihnen am Telefon. Sie stehen in einem anderen Bundesland? Rufen Sie trotzdem an.</p>
+        <a class="callpanel-soon" href="#gebiet"><span class="soon-tag" data-i18n="soon.tag">Bald</span><span data-i18n="hero.soon">Eigenes Team für Frankfurt und Rhein-Main</span></a>
       </div>
     </div>
   </section>
@@ -248,7 +258,8 @@
     </div>
   </section>
 
-  <section class="section wrap" id="ablauf" aria-labelledby="steps-h">
+  <section class="band" id="ablauf" aria-labelledby="steps-h">
+    <div class="wrap">
     <div class="section-head">
       <h2 id="steps-h" data-i18n="steps.h">So läuft der Einsatz ab</h2>
     </div>
@@ -258,6 +269,7 @@
       <li><h3 data-i18n="steps.3h">Abpumpen und spülen</h3><p data-i18n="steps.3p">Wir saugen den falschen Kraftstoff ab und spülen Tank und Leitungen, damit keine Reste zurückbleiben.</p></li>
       <li><h3 data-i18n="steps.4h">Sie fahren weiter</h3><p data-i18n="steps.4p">Richtigen Kraftstoff einfüllen, starten, weiterfahren. Den abgepumpten Kraftstoff nehmen wir mit und entsorgen ihn fachgerecht.</p></li>
     </ol>
+    </div>
   </section>
 
   <section class="section wrap prices" id="preise" aria-labelledby="prices-h">
@@ -292,23 +304,34 @@
         <h3 data-i18n="area.west.h">Nordrhein-Westfalen, Hessen und Rheinland-Pfalz</h3>
         <p data-i18n="area.west.p">Köln, Düsseldorf, Dortmund, Essen, Duisburg, Bochum, Wuppertal, Bonn, Gelsenkirchen, Mönchengladbach, Aachen, Krefeld, Leverkusen, Solingen und die Orte dazwischen.</p>
         <a class="btn-call btn-call-s" href="tel:{{WEST_TEL}}" data-region="west">
-          <svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg>
-          <span class="btn-call-text"><span class="num">{{WEST_NUM}}</span></span>
+          <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
+          <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{WEST_NUM}}</span></span>
         </a>
       </div>
       <div class="area">
         <h3 data-i18n="area.by.h">Bayern</h3>
         <p data-i18n="area.by.p">München, Nürnberg, Augsburg, Regensburg, Ingolstadt, Würzburg, Fürth, Erlangen, Bamberg, Bayreuth, Landshut, Rosenheim, Kempten, Passau. Auch entlang der A3, A8, A9, A93 und A99. Hier fährt unser fester Servicepartner.</p>
         <a class="btn-call btn-call-s" href="tel:{{BY_TEL}}" data-region="by">
-          <svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg>
-          <span class="btn-call-text"><span class="num">{{BY_NUM}}</span></span>
+          <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
+          <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{BY_NUM}}</span></span>
+        </a>
+      </div>
+      <div class="area area-soon" id="rhein-main">
+        <h3><span data-i18n="area.rm.h">Rhein-Main</span> <span class="soon-tag" data-i18n="soon.tag">Bald</span></h3>
+        <p data-i18n="area.rm.p">Frankfurt am Main, Offenbach, Darmstadt, Wiesbaden, Mainz, Hanau, Bad Homburg, Rüsselsheim, Friedberg, Gießen, Wetzlar, Limburg, Bensheim und Worms. Dazu der weitere Umkreis bis etwa 100 Kilometer, zum Beispiel Mannheim, Ludwigshafen, Heidelberg, Marburg, Fulda und Koblenz.</p>
+        <p class="area-soon-lead" data-i18n="area.rm.soon">Hier sind wir bald mit eigenem Team und eigener Telefonnummer vor Ort.</p>
+        <p class="area-soon-note" data-i18n="area.rm.note">Bis die neue Nummer da ist, hilft Ihnen diese weiter:</p>
+        <a class="btn-call btn-call-s" href="tel:{{WEST_TEL}}" data-region="west">
+          <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
+          <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{WEST_NUM}}</span></span>
         </a>
       </div>
     </div>
     <p class="area-other" data-i18n="area.other">Sie stehen in einem anderen Bundesland? Rufen Sie an. Wir sagen Ihnen sofort, ob wir zu Ihnen kommen können.</p>
   </section>
 
-  <section class="section wrap" id="bewertungen" aria-labelledby="rating-h">
+  <section class="band" id="bewertungen" aria-labelledby="rating-h">
+    <div class="wrap">
     <div class="section-head">
       <h2 id="rating-h" data-i18n="rating.h">So bewerten uns Kunden bei Google</h2>
     </div>
@@ -331,6 +354,7 @@
       </a>
     </div>
     <p class="fine" data-i18n="rating.fine">Stand: November 2026. Die Zahlen stammen aus den Google-Profilen unserer Einsatzteams. Dort können Sie jede Bewertung nachlesen.</p>
+    </div>
   </section>
 
   <section class="section wrap faq" id="fragen" aria-labelledby="faq-h">
@@ -381,19 +405,19 @@
       </div>
       <div class="callpanel">
         <a class="btn-call" href="tel:{{WEST_TEL}}" data-region="west">
-          <svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg>
-          <span class="btn-call-text"><span class="num">{{WEST_NUM}}</span><span class="where" data-i18n="region.west">NRW, Hessen, Rheinland-Pfalz</span></span>
+          <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
+          <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{WEST_NUM}}</span><span class="where" data-i18n="region.west">NRW, Hessen, Rheinland-Pfalz</span></span>
         </a>
         <a class="btn-call" href="tel:{{BY_TEL}}" data-region="by">
-          <svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg>
-          <span class="btn-call-text"><span class="num">{{BY_NUM}}</span><span class="where" data-i18n="region.by">Bayern</span></span>
+          <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
+          <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{BY_NUM}}</span><span class="where" data-i18n="region.by">Bayern</span></span>
         </a>
         <div class="callpanel-more">
-          <a class="btn btn-wa" href="https://wa.me/{{WEST_WA}}?text={{WA_TEXT}}" data-open-sheet="wa" rel="noopener">
+          <a class="btn btn-ghost btn-wa-ghost" href="https://wa.me/{{WEST_WA}}?text={{WA_TEXT}}" data-open-sheet="wa" rel="noopener">
             <svg class="ico" aria-hidden="true"><use href="#i-bubble"/></svg><span data-i18n="cta.wa">WhatsApp</span>
           </a>
           <button type="button" class="btn btn-ghost" data-open-chat>
-            <svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg><span data-i18n="cta.chat">Chat starten</span>
+            <svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg><span data-i18n="cta.chat">Chat<span class="lbl-more"> starten</span></span>
           </button>
         </div>
       </div>
@@ -410,7 +434,7 @@
   <p>{{COMPANY}}<br>Inhaber: {{OWNER}}<br>{{STREET}}<br>{{CITY}}</p>
   <h2>Kontakt</h2>
   <p>Telefon: <a href="tel:{{OFFICE_TEL}}">{{OFFICE_NUM}}</a><br>E-Mail: <a href="mailto:{{EMAIL}}">{{EMAIL}}</a></p>
-  <p>Einsatz-Hotline NRW, Hessen und Rheinland-Pfalz: <a href="tel:{{WEST_TEL}}">{{WEST_NUM}}</a><br>Einsatz-Hotline Bayern: <a href="tel:{{BY_TEL}}">{{BY_NUM}}</a></p>
+  <p>Einsatz-Hotline NRW, Hessen und Rheinland-Pfalz: <a href="tel:{{WEST_TEL}}">{{WEST_NUM}}</a><br>Einsatz-Hotline Bayern: <a href="tel:{{BY_TEL}}">{{BY_NUM}}</a><br>Rhein-Main: eigene Nummer in Vorbereitung, bis dahin über die Hotline für Hessen</p>
   <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
   <p>{{OWNER}}, Anschrift wie oben</p>
   <h2>Verbraucherstreitbeilegung</h2>
@@ -437,9 +461,10 @@
   <h2>4. Soforthilfe-Chat</h2>
   <p>Der Chat auf dieser Website ist ein automatischer Assistent. Er läuft vollständig in Ihrem Browser. Ihre Eingaben werden nicht an uns oder an Dritte übertragen und nicht gespeichert. Erst wenn Sie am Ende selbst auf Anrufen tippen oder die vorbereitete WhatsApp-Nachricht abschicken, erreichen uns Ihre Angaben.</p>
   <h2>5. Standort</h2>
-  <p>Im Chat können Sie Ihren Standort ermitteln lassen. Das geschieht nur, wenn Sie darauf tippen und die Abfrage in Ihrem Browser erlauben. Der Standort wird ausschließlich in Ihre WhatsApp-Nachricht eingefügt, die Sie selbst absenden.</p>
+  <p>Auf der Startseite und im Chat können Sie Ihren Standort freigeben. Das geschieht nur, wenn Sie darauf tippen und die Abfrage in Ihrem Browser erlauben. Haben Sie die Freigabe für diese Website dauerhaft erteilt, ermittelt Ihr Browser den Standort beim nächsten Besuch von selbst.</p>
+  <p>Der Standort wird ausschließlich in Ihrem Browser ausgewertet, um Ihr Bundesland zu bestimmen und Ihnen die Telefonnummer des zuständigen Einsatzteams zu zeigen. Er wird nicht an uns oder an Dritte übertragen und nicht gespeichert. Nur wenn Sie selbst eine WhatsApp-Nachricht abschicken, enthält diese einen Link zu Ihrem Standort. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 Buchst. a DSGVO, § 25 Abs. 1 TDDDG). Sie können die Freigabe jederzeit in den Einstellungen Ihres Browsers widerrufen.</p>
   <h2>6. Speicherung auf Ihrem Gerät</h2>
-  <p>Damit die Seite beim nächsten Besuch in Ihrer Sprache erscheint, speichert Ihr Browser die gewählte Sprache und das gewählte Einsatzgebiet lokal auf Ihrem Gerät. Diese Angaben werden nicht an uns übertragen. Die Speicherung ist für die von Ihnen gewünschte Funktion erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG).</p>
+  <p>Damit die Seite beim nächsten Besuch in Ihrer Sprache erscheint, speichert Ihr Browser die gewählte Sprache lokal auf Ihrem Gerät. Diese Angabe wird nicht an uns übertragen. Die Speicherung ist für die von Ihnen gewünschte Funktion erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG).</p>
   <h2>7. Externe Links</h2>
   <p>Die Links zu unseren Google-Bewertungen und zu WhatsApp führen auf Seiten anderer Anbieter. Daten werden erst übertragen, wenn Sie einen solchen Link antippen.</p>
   <h2>8. Ihre Rechte</h2>
@@ -478,6 +503,12 @@
       <h2 id="sheet-h" data-i18n="sheet.h">Wo steht Ihr Fahrzeug?</h2>
       <button type="button" class="iconbtn" data-close-sheet aria-label="Schließen" data-i18n-aria="close"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
+    <button type="button" class="loc-btn loc-btn-sheet" data-locate>
+      <span class="loc-ico" aria-hidden="true"><svg class="ico"><use href="#i-target"/></svg></span>
+      <span class="loc-text"><span class="loc-title" data-i18n="loc.btn">Standort freigeben</span><span class="loc-sub" data-i18n="loc.sub">Wir verbinden Sie mit dem richtigen Einsatzteam</span></span>
+      <svg class="ico loc-go" aria-hidden="true"><use href="#i-chev"/></svg>
+    </button>
+    <p class="loc-status" role="status" hidden></p>
     <a class="sheet-row" data-sheet-region="west" href="tel:{{WEST_TEL}}"><span class="sheet-where" data-i18n="region.west">NRW, Hessen, Rheinland-Pfalz</span><span class="num">{{WEST_NUM}}</span></a>
     <a class="sheet-row" data-sheet-region="by" href="tel:{{BY_TEL}}"><span class="sheet-where" data-i18n="region.by">Bayern</span><span class="num">{{BY_NUM}}</span></a>
     <a class="sheet-row sheet-row-other" data-sheet-region="other" href="tel:{{WEST_TEL}}"><span class="sheet-where" data-i18n="region.other">Anderes Bundesland</span><span class="num">{{WEST_NUM}}</span></a>

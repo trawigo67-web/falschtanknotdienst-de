@@ -53,28 +53,171 @@
     if (cur) { cur.textContent = l.toUpperCase(); }
     $$('.legal-lang').forEach(function (p) { p.hidden = (l === 'de'); });
     if (persist) { store.set('lang', l); }
+    renderLocator();
     if (chatStarted) { restart(false); }
   }
 
-  /* ---------- Gebiet, Anruf und WhatsApp ---------- */
-  var region = null; /* gilt nur für diesen Besuch */
-  function setRegion(r) { if (r === 'west' || r === 'by') { region = r; } }
-  function waHref(r, text) {
-    return 'https://wa.me/' + CFG.regions[r].wa + '?text=' + encodeURIComponent(text || CFG.waText);
+  /* ---------- Standort: Bundesland aus Koordinaten (Grenzen stehen in geo.js) ---------- */
+  var GEO = null;
+  function geoRings() {
+    if (GEO) { return GEO; }
+    GEO = {};
+    Object.keys(GEO_STATES).forEach(function (code) {
+      GEO[code] = GEO_STATES[code].map(function (str) {
+        var pts = [], i = 0, x = 0, y = 0;
+        function num() {
+          var r = 0, sh = 0, b;
+          do { b = str.charCodeAt(i++) - 63; r |= (b & 31) << sh; sh += 5; } while (b >= 32);
+          return (r & 1) ? ~(r >> 1) : (r >> 1);
+        }
+        while (i < str.length) { x += num(); y += num(); pts.push([x / 1000, y / 1000]); }
+        return pts;
+      });
+    });
+    return GEO;
   }
+  function inRings(rings, lon, lat) {
+    var inside = false;
+    for (var k = 0; k < rings.length; k++) {
+      var r = rings[k];
+      for (var i = 0, j = r.length - 1; i < r.length; j = i++) {
+        var xi = r[i][0], yi = r[i][1], xj = r[j][0], yj = r[j][1];
+        if ((yi > lat) !== (yj > lat) && lon < (xj - xi) * (lat - yi) / (yj - yi) + xi) { inside = !inside; }
+      }
+    }
+    return inside;
+  }
+  function stateAt(lat, lon) {
+    if (!(lat > 47 && lat < 55.2 && lon > 5.5 && lon < 15.3)) { return null; }
+    var g = geoRings(), codes = Object.keys(g), k;
+    for (k = 0; k < codes.length; k++) { if (inRings(g[codes[k]], lon, lat)) { return codes[k]; } }
+    /* knapp neben der vereinfachten Außengrenze: das nächste Land, höchstens 3 km entfernt */
+    var best = null, bd = 3, kx = 111.32 * Math.cos(lat * Math.PI / 180), ky = 111.2;
+    codes.forEach(function (c) {
+      g[c].forEach(function (r) {
+        for (var i = 0, j = r.length - 1; i < r.length; j = i++) {
+          var ax = (r[j][0] - lon) * kx, ay = (r[j][1] - lat) * ky, bx = (r[i][0] - lon) * kx, by = (r[i][1] - lat) * ky;
+          var dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy;
+          var u = L ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / L)) : 0;
+          var d = Math.sqrt(Math.pow(ax + u * dx, 2) + Math.pow(ay + u * dy, 2));
+          if (d < bd) { bd = d; best = c; }
+        }
+      });
+    });
+    return best;
+  }
+  function kmBetween(aLat, aLon, bLat, bLon) {
+    var q = Math.PI / 180, dLat = (bLat - aLat) * q, dLon = (bLon - aLon) * q;
+    var h = Math.pow(Math.sin(dLat / 2), 2) + Math.cos(aLat * q) * Math.cos(bLat * q) * Math.pow(Math.sin(dLon / 2), 2);
+    return 12742 * Math.asin(Math.sqrt(h));
+  }
+
+  /* ---------- Gebiet, Standort-Weiche, Anruf und WhatsApp ---------- */
+  var STATE_KEY = { NW: 'nrw', HE: 'he', RP: 'rp', BY: 'by' };
+  var region = null;      /* gilt nur für diesen Besuch */
+  var fix = null;         /* freigegebener Standort: { lat, lon, acc, code, region, soon } */
+  var locState = 'idle';  /* idle | busy | ok | denied | fail */
+  var locBusy = false;
+  var locCbs = [];
+  function setRegion(r) { if (r === 'west' || r === 'by') { region = r; } }
+  function soonAt(lat, lon) {
+    var hit = null;
+    Object.keys(CFG.soon || {}).forEach(function (k) {
+      var z = CFG.soon[k];
+      if (!hit && kmBetween(lat, lon, z.center[0], z.center[1]) <= z.radiusKm) { hit = k; }
+    });
+    return hit;
+  }
+  function resolveFix(lat, lon, acc) {
+    var code = stateAt(lat, lon);
+    var r = code === 'BY' ? 'by' : (STATE_KEY[code] ? 'west' : null);
+    var soon = (code && code !== 'BY') ? soonAt(lat, lon) : null;
+    if (soon && !r) { r = CFG.soon[soon].fallback || 'west'; }
+    return { lat: lat, lon: lon, acc: acc, code: code, region: r, soon: soon };
+  }
+  function waDefault() {
+    var text = CFG.waText;
+    if (fix && locState === 'ok') { text += 'https://maps.google.com/?q=' + fix.lat.toFixed(5) + ',' + fix.lon.toFixed(5); }
+    return text;
+  }
+  function waHref(r, text) {
+    return 'https://wa.me/' + CFG.regions[r].wa + '?text=' + encodeURIComponent(text || waDefault());
+  }
+  function defaultText(node) { return lang === 'de' ? orig.html.get(node) : t(node.getAttribute('data-i18n')); }
 
   var sheet = $('#sheet');
   var sheetFocus = null;
-  function openSheet(mode) {
-    sheet.classList.toggle('is-wa', mode === 'wa');
+  var sheetMode = 'call';
+  function syncSheet() {
+    var mine = (locState === 'ok' && fix) ? fix.region : null;
     $$('[data-sheet-region]', sheet).forEach(function (a) {
-      var r = a.getAttribute('data-sheet-region') === 'by' ? 'by' : 'west';
-      if (mode === 'wa') { a.href = waHref(r); a.rel = 'noopener'; } else { a.href = 'tel:' + CFG.regions[r].tel; a.removeAttribute('rel'); }
+      var key = a.getAttribute('data-sheet-region');
+      var r = key === 'by' ? 'by' : 'west';
+      if (sheetMode === 'wa') { a.href = waHref(r); a.rel = 'noopener'; } else { a.href = 'tel:' + CFG.regions[r].tel; a.removeAttribute('rel'); }
+      a.classList.toggle('is-hidden', !!mine && key !== mine);
     });
-    $('.sheet-note', sheet).innerHTML = t(mode === 'wa' ? 'sheet.note.wa' : 'sheet.note.call');
+  }
+  function renderLocator() {
+    var ok = locState === 'ok' && !!fix;
+    var mine = ok ? fix.region : null;
+    var status = '';
+    root.setAttribute('data-loc', locState);
+    $$('[data-locate]').forEach(function (b) {
+      var title = $('.loc-title', b), sub = $('.loc-sub', b), use = $('.loc-ico use', b);
+      if (locState === 'busy') { title.textContent = t('loc.busy'); sub.textContent = t('loc.busy.sub'); }
+      else if (ok) { title.textContent = fix.code ? t('st.' + fix.code) : t('loc.abroad.t'); sub.textContent = t('loc.ok.sub'); }
+      else { title.innerHTML = defaultText(title); sub.innerHTML = defaultText(sub); }
+      if (use) { use.setAttribute('href', ok ? '#i-check' : '#i-target'); }
+      b.setAttribute('aria-busy', String(locState === 'busy'));
+    });
+    if (ok) {
+      if (!fix.code) { status = t('loc.abroad'); }
+      else if (fix.soon) { status = t('loc.soon'); }
+      else if (!fix.region) { status = t('loc.other'); }
+    } else if (locState === 'denied') { status = t('loc.denied'); }
+    else if (locState === 'fail') { status = t('loc.fail'); }
+    $$('.loc-status').forEach(function (p) { p.textContent = status; p.hidden = !status; });
+    $$('.callpanel .btn-call').forEach(function (a) {
+      var r = a.getAttribute('data-region'), where = $('.where', a);
+      a.classList.toggle('is-other', !!mine && r !== mine);
+      if (where) { where.innerHTML = (mine && r === mine && STATE_KEY[fix.code]) ? t('loc.team').replace('{state}', t('st.' + fix.code)) : defaultText(where); }
+    });
+    if (region) {
+      $$('a[data-open-sheet]').forEach(function (a) { a.href = a.getAttribute('data-open-sheet') === 'wa' ? waHref(region) : 'tel:' + CFG.regions[region].tel; });
+    }
+    syncSheet();
+  }
+  function locate(auto, done) {
+    if (done) { locCbs.push(done); }
+    if (locBusy) { return; }
+    function finish(state, success) {
+      locBusy = false;
+      locState = (auto && !success) ? 'idle' : state;
+      renderLocator();
+      var cbs = locCbs; locCbs = [];
+      cbs.forEach(function (cb) { cb(success); });
+    }
+    if (!navigator.geolocation) { finish('fail', false); return; }
+    var fresh = locState === 'ok'; /* erneutes Antippen: Standort neu messen statt den letzten zu nehmen */
+    locBusy = true;
+    if (!auto) { locState = 'busy'; renderLocator(); }
+    try {
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        fix = resolveFix(pos.coords.latitude, pos.coords.longitude, Math.max(1, Math.round(pos.coords.accuracy || 0)));
+        if (fix.region) { setRegion(fix.region); }
+        finish('ok', true);
+      }, function (err) { finish(err && err.code === 1 ? 'denied' : 'fail', false); }, { enableHighAccuracy: true, timeout: 12000, maximumAge: fresh ? 0 : 120000 });
+    } catch (e) { finish('fail', false); }
+  }
+
+  function openSheet(mode) {
+    sheetMode = mode === 'wa' ? 'wa' : 'call';
+    sheet.classList.toggle('is-wa', sheetMode === 'wa');
+    syncSheet();
+    $('.sheet-note', sheet).innerHTML = t(sheetMode === 'wa' ? 'sheet.note.wa' : 'sheet.note.call');
     sheetFocus = doc.activeElement;
     sheet.hidden = false;
-    var first = $('.sheet-row', sheet);
+    var first = $('.sheet-row:not(.is-hidden)', sheet);
     if (first) { first.focus(); }
   }
   function closeSheet() {
@@ -150,7 +293,7 @@
   var token = 0;
   var currentChips = [];
   var CASES = ['p_in_d', 'd_in_p', 'adblue', 'inadblue', 'grade'];
-  var PHONE = '<svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg>';
+  var PHONE = '<span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>';
   var BUBBLE = '<svg class="ico" aria-hidden="true"><use href="#i-bubble"/></svg>';
 
   function T(k, vars) {
@@ -163,7 +306,22 @@
   function priceVars() { return { car: CFG.price.car, camper: CFG.price.camper }; }
 
   function resetState() {
-    S = { kase: null, engine: null, vehicle: null, state: null, region: null, place: '', geo: null, placeDone: false, gradeDone: false, asked: null, finished: false };
+    S = { kase: null, engine: null, vehicle: null, state: null, region: null, code: null, soon: null, place: '', geo: null, placeDone: false, gradeDone: false, asked: null, finished: false };
+    if (fix && locState === 'ok' && fix.code) {
+      /* Standort wurde schon auf der Seite freigegeben: Gebiet und Ort sind bekannt */
+      S.geo = { lat: fix.lat, lon: fix.lon, acc: fix.acc };
+      S.placeDone = true;
+      S.code = fix.code;
+      S.soon = fix.soon;
+      S.state = STATE_KEY[fix.code] || 'other';
+      S.region = fix.region || 'west';
+    }
+  }
+  function callBtn(r, cls) {
+    var a = el('a', cls || 'btn-call', PHONE + '<span class="btn-call-text"><span class="call-label">' + T('call.now') + '</span><span class="num">' + CFG.regions[r].num + '</span><span class="where">' + T('call.' + r) + '</span></span>');
+    a.href = 'tel:' + CFG.regions[r].tel;
+    a.setAttribute('data-region', r);
+    return a;
   }
   function el(tag, cls, html) {
     var e = doc.createElement(tag);
@@ -205,7 +363,7 @@
     enqueue(function () {
       var w = el('div', 'chips');
       list.forEach(function (c) {
-        var b = el('button', 'chip');
+        var b = el('button', c.cls ? 'chip ' + c.cls : 'chip');
         b.type = 'button';
         b.textContent = c.label;
         b.addEventListener('click', function () { addUser(c.label); c.go(); });
@@ -218,12 +376,7 @@
   function callCard() {
     enqueue(function () {
       var card = el('div', 'result');
-      (region ? [region] : ['west', 'by']).forEach(function (r) {
-        var a = el('a', 'btn-call', PHONE + '<span class="btn-call-text"><span class="num">' + CFG.regions[r].num + '</span><span class="where">' + T('call.' + r) + '</span></span>');
-        a.href = 'tel:' + CFG.regions[r].tel;
-        a.setAttribute('data-region', r);
-        card.appendChild(a);
-      });
+      (region ? [region] : ['west', 'by']).forEach(function (r) { card.appendChild(callBtn(r)); });
       logEl.appendChild(card);
     }, 250);
   }
@@ -271,39 +424,47 @@
   }
   function setState(s) {
     S.state = s;
+    S.code = null;
     S.region = s === 'by' ? 'by' : 'west';
     if (s !== 'other') { setRegion(S.region); }
   }
   function askRegion() {
     S.asked = 'region';
     say(T('askRegion'));
-    chips(['nrw', 'he', 'rp', 'by', 'other'].map(function (s) {
+    chips([{ label: T('p.share'), cls: 'chip-loc', go: locateChat }].concat(['nrw', 'he', 'rp', 'by', 'other'].map(function (s) {
       return { label: T('r.' + s), go: function () { setState(s); next(); } };
-    }));
+    })));
   }
   function askPlace() {
     S.asked = 'place';
     say(T('askPlace'));
     chips([
-      { label: T('p.geo'), go: locate },
+      { label: T('p.geo'), go: locateChat },
       { label: T('p.skip'), go: function () { S.placeDone = true; next(); } }
     ]);
   }
   function geoFail() { S.asked = 'place'; say(T('geo.fail')); }
-  function locate() {
+  function locateChat() {
     var my = token;
     say(T('geo.wait'));
     enqueue(function () {
-      if (!navigator.geolocation) { geoFail(); return; }
-      try {
-        navigator.geolocation.getCurrentPosition(function (pos) {
-          if (my !== token) { return; }
-          S.geo = { lat: pos.coords.latitude, lon: pos.coords.longitude, acc: Math.max(1, Math.round(pos.coords.accuracy || 0)) };
-          S.placeDone = true;
-          say(T('geo.ok', { m: String(S.geo.acc) }));
-          next();
-        }, function () { if (my === token) { geoFail(); } }, { enableHighAccuracy: true, timeout: 9000, maximumAge: 60000 });
-      } catch (e) { geoFail(); }
+      locate(false, function (success) {
+        if (my !== token) { return; }
+        if (!success) { geoFail(); return; }
+        S.geo = { lat: fix.lat, lon: fix.lon, acc: fix.acc };
+        S.placeDone = true;
+        S.soon = fix.soon;
+        S.code = fix.code;
+        if (fix.code) {
+          setState(STATE_KEY[fix.code] || 'other');
+          S.code = fix.code;
+          say(T('geo.ok', { m: String(fix.acc) }) + ' ' + T('geo.in', { state: t('st.' + fix.code) }));
+        } else {
+          if (!S.state) { setState('other'); }
+          say(T('geo.ok', { m: String(fix.acc) }) + ' ' + T('geo.abroad'));
+        }
+        next();
+      });
     }, 0);
   }
   function placeLabel() {
@@ -317,7 +478,7 @@
       'Fall: ' + D['c.' + S.kase],
       'Motor: ' + D['es.' + S.engine],
       'Fahrzeug: ' + D['v.' + S.vehicle],
-      'Bundesland: ' + D['r.' + S.state]
+      'Bundesland: ' + (S.code ? I18N.de['st.' + S.code] : D['r.' + S.state])
     ];
     var place = S.place || '';
     if (S.geo) { place = (place ? place + ', ' : '') + 'https://maps.google.com/?q=' + S.geo.lat.toFixed(5) + ',' + S.geo.lon.toFixed(5); }
@@ -330,12 +491,11 @@
     S.asked = null;
     S.finished = true;
     var r = S.region || 'west';
-    var R = CFG.regions[r];
     enqueue(function () {
       var card = el('div', 'result');
       card.appendChild(el('h3', '', T('res.title')));
       var dl = el('dl');
-      [['f.case', T('c.' + S.kase)], ['f.engine', T('es.' + S.engine)], ['f.vehicle', T('v.' + S.vehicle)], ['f.region', T('r.' + S.state)], ['f.place', placeLabel()]].forEach(function (row) {
+      [['f.case', T('c.' + S.kase)], ['f.engine', T('es.' + S.engine)], ['f.vehicle', T('v.' + S.vehicle)], ['f.region', S.code ? t('st.' + S.code) : T('r.' + S.state)], ['f.place', placeLabel()]].forEach(function (row) {
         dl.appendChild(el('dt', '', T(row[0])));
         var dd = el('dd');
         dd.textContent = row[1];
@@ -343,9 +503,8 @@
       });
       card.appendChild(dl);
       card.appendChild(el('p', '', T(S.state === 'other' ? 'res.other' : 'res.lead')));
-      var call = el('a', 'btn-call', PHONE + '<span class="btn-call-text"><span class="num">' + R.num + '</span><span class="where">' + T('call.' + r) + '</span></span>');
-      call.href = 'tel:' + R.tel;
-      card.appendChild(call);
+      if (S.soon && S.state !== 'other') { card.appendChild(el('p', 'result-soon', T('res.soon'))); }
+      card.appendChild(callBtn(r));
       var wa = el('a', 'btn btn-wa', BUBBLE + '<span>' + T('res.wa') + '</span>');
       wa.href = waHref(r, waMessage());
       wa.rel = 'noopener';
@@ -452,6 +611,9 @@
     ['nrw', 'ratingen', 'Ratingen'], ['nrw', 'dormagen', 'Dormagen'], ['nrw', 'duren|dueren', 'Düren'], ['nrw', 'kerpen', 'Kerpen'],
     ['he', 'hessen|hesse', ''], ['he', 'frankfurt', 'Frankfurt'], ['he', 'wiesbaden', 'Wiesbaden'], ['he', 'kassel', 'Kassel'], ['he', 'darmstadt', 'Darmstadt'],
     ['he', 'offenbach', 'Offenbach'], ['he', 'giessen', 'Gießen'], ['he', 'fulda', 'Fulda'], ['he', 'hanau', 'Hanau'], ['he', 'marburg', 'Marburg'], ['he', 'wetzlar', 'Wetzlar'],
+    ['he', 'russelsheim|ruesselsheim', 'Rüsselsheim'], ['he', 'bad homburg', 'Bad Homburg'], ['he', 'oberursel', 'Oberursel'], ['he', 'eschborn', 'Eschborn'], ['he', 'neu-isenburg|neu isenburg', 'Neu-Isenburg'],
+    ['he', 'dreieich', 'Dreieich'], ['he', 'rodgau', 'Rodgau'], ['he', 'bad vilbel', 'Bad Vilbel'], ['he', 'maintal', 'Maintal'], ['he', 'bad nauheim', 'Bad Nauheim'], ['he', 'dietzenbach', 'Dietzenbach'],
+    ['he', 'limburg', 'Limburg'], ['he', 'bensheim', 'Bensheim'], ['he', 'rhein-main|rhein main|rhine-main', ''],
     ['rp', 'rheinland-pfalz|rheinland pfalz|rhineland', ''], ['rp', 'mainz', 'Mainz'], ['rp', 'koblenz', 'Koblenz'], ['rp', 'trier', 'Trier'], ['rp', 'ludwigshafen', 'Ludwigshafen'],
     ['rp', 'kaiserslautern', 'Kaiserslautern'], ['rp', 'worms', 'Worms'], ['rp', 'neuwied', 'Neuwied'], ['rp', 'speyer', 'Speyer'],
     ['by', 'bayern|bavaria|bavyera', ''], ['by', 'munchen|muenchen|munich|munih', 'München'], ['by', 'nurnberg|nuernberg|nuremberg', 'Nürnberg'], ['by', 'augsburg', 'Augsburg'],
@@ -459,6 +621,15 @@
     ['by', 'bamberg', 'Bamberg'], ['by', 'bayreuth', 'Bayreuth'], ['by', 'landshut', 'Landshut'], ['by', 'rosenheim', 'Rosenheim'], ['by', 'kempten', 'Kempten'],
     ['by', 'aschaffenburg', 'Aschaffenburg'], ['by', 'passau', 'Passau'], ['by', 'schweinfurt', 'Schweinfurt'], ['by', 'straubing', 'Straubing'], ['by', 'freising', 'Freising']
   ].map(function (c) { return { state: c[0], rx: new RegExp('\\b(?:' + c[1] + ')\\b'), name: c[2] }; });
+  /* Orte, für die bald das eigene Team Rhein-Main zuständig ist */
+  var SOON_RX = /\b(?:frankfurt|offenbach|darmstadt|wiesbaden|mainz|hanau|russelsheim|ruesselsheim|bad homburg|oberursel|eschborn|neu-isenburg|neu isenburg|dreieich|rodgau|bad vilbel|maintal|bad nauheim|dietzenbach|giessen|wetzlar|limburg|bensheim|worms|rhein-main|rhein main|rhine-main)\b/;
+  function plzSoon(p) {
+    var a = parseInt(p.slice(0, 2), 10);
+    var b = parseInt(p.slice(0, 3), 10);
+    if (b >= 637 && b <= 639) { return null; }
+    if (a === 60 || a === 61 || a === 63 || a === 64 || a === 65 || (b >= 550 && b <= 552) || (b >= 353 && b <= 355)) { return 'rm'; }
+    return null;
+  }
 
   function plzState(p) {
     var a = parseInt(p.slice(0, 2), 10);
@@ -477,7 +648,7 @@
   }
   function understand(text) {
     var f = fold(text);
-    var u = { kase: null, ambig: false, engine: null, vehicle: null, state: null, place: '', intent: null, greet: false, thanks: false };
+    var u = { kase: null, ambig: false, engine: null, vehicle: null, state: null, soon: null, place: '', intent: null, greet: false, thanks: false };
     if (firstIndex(RX.inadblue, f) >= 0) { u.kase = 'inadblue'; }
     else if (firstIndex(RX.adblue, f) >= 0) { u.kase = 'adblue'; }
     else if (RX.anyAdblue.test(f)) { u.ambig = true; }
@@ -503,7 +674,9 @@
       var st = plzState(plz[1]);
       if (st && !u.state) { u.state = st; }
       u.place = (u.place ? u.place + ' ' : 'PLZ ') + plz[1];
+      if (plzSoon(plz[1])) { u.soon = 'rm'; }
     }
+    if (!u.soon && SOON_RX.test(f)) { u.soon = 'rm'; }
     for (var k = 0; k < INTENTS.length; k++) {
       if (INTENTS[k][1].test(f)) { u.intent = INTENTS[k][0]; break; }
     }
@@ -533,6 +706,7 @@
       S.place = text.slice(0, 160);
       S.placeDone = true;
       if (u.state && !S.state) { setState(u.state); }
+      if (u.soon) { S.soon = u.soon; }
       next();
       return;
     }
@@ -543,6 +717,7 @@
     if (u.vehicle && !S.vehicle) { S.vehicle = u.vehicle; got.push(T('v.' + u.vehicle)); }
     if (u.state && !S.state) { setState(u.state); got.push((u.place ? u.place + ', ' : '') + T('r.' + u.state)); }
     if (u.place && !S.place) { S.place = u.place; }
+    if (u.soon) { S.soon = u.soon; }
     if (got.length) { say(T('understood', { list: got.join(', ') })); }
     if (engineNew) { advise(); }
     if (u.intent) {
@@ -649,6 +824,7 @@
       $('.lang-current').setAttribute('aria-expanded', 'false');
     }
     if (langBtn) { return; }
+    if (target.closest('[data-locate]')) { locate(false); return; }
     var row = target.closest('[data-sheet-region]');
     if (row) { setRegion(row.getAttribute('data-sheet-region')); window.setTimeout(closeSheet, 350); return; }
     var opener = target.closest('[data-open-sheet]');
@@ -685,6 +861,13 @@
     }
     if (l !== 'de') { setLang(l, false); }
   })();
+  renderLocator();
+  /* Wurde die Standortfreigabe für diese Seite schon früher erteilt, gleich die passende Nummer zeigen */
+  if (navigator.geolocation && navigator.permissions && navigator.permissions.query) {
+    try {
+      navigator.permissions.query({ name: 'geolocation' }).then(function (st) { if (st && st.state === 'granted') { locate(true); } }, function () { /* Abfrage nicht möglich */ });
+    } catch (e) { /* ältere Browser */ }
+  }
 
-  window.__tank = { understand: understand, setLang: setLang, openChat: openChat };
+  window.__tank = { understand: understand, setLang: setLang, openChat: openChat, stateAt: stateAt, resolveFix: resolveFix, kmBetween: kmBetween, setFix: function (lat, lon) { fix = resolveFix(lat, lon, 12); if (fix.region) { setRegion(fix.region); } locState = 'ok'; renderLocator(); return fix; } };
 })();

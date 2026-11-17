@@ -1,25 +1,46 @@
 {
-  "brand": "tankabpumpen",
-  "brandHtml": "tank<b>ab</b>pumpen",
-  "tld": ".de",
-  "domain": "tankabpumpen.de",
-  "title": "Falsch getankt? Tank abpumpen vor Ort, rund um die Uhr | tankabpumpen.de",
-  "regions": {
-    "west": {"tel": "+491742432222", "num": "0174 243 22 22", "wa": "491742432222"},
-    "by": {"tel": "+491704044555", "num": "0170 404 45 55", "wa": "491704044555"}
+ "brand": "tankabpumpen",
+ "brandHtml": "tank<b>ab</b>pumpen",
+ "tld": ".de",
+ "domain": "tankabpumpen.de",
+ "title": "Falsch getankt? Tank abpumpen vor Ort, rund um die Uhr | tankabpumpen.de",
+ "regions": {
+  "west": {
+   "tel": "+491742432222",
+   "num": "0174 243 22 22",
+   "wa": "491742432222"
   },
-  "price": {"car": "350", "camper": "450"},
-  "reviews": {
-    "west": "https://maps.google.com/?cid=1920854753748776528",
-    "by": "https://share.google/4N2v560bc8yYOeLa0"
-  },
-  "company": "IG-Trade24 GERMANY",
-  "companyShort": "IG-Trade24 Germany",
-  "owner": "Ihsan Gercek",
-  "street": "Rheinische Straße 28",
-  "city": "42781 Haan",
-  "officeTel": "+4915222753000",
-  "officeNum": "+49 152 22 75 3000",
-  "email": "kontakt@falschgetankt24.com",
-  "waText": "Hallo, ich habe falsch getankt und brauche Hilfe. Mein Standort: "
+  "by": {
+   "tel": "+491704044555",
+   "num": "0170 404 45 55",
+   "wa": "491704044555"
+  }
+ },
+ "price": {
+  "car": "350",
+  "camper": "450"
+ },
+ "reviews": {
+  "west": "https://maps.google.com/?cid=1920854753748776528",
+  "by": "https://share.google/4N2v560bc8yYOeLa0"
+ },
+ "company": "IG-Trade24 GERMANY",
+ "companyShort": "IG-Trade24 Germany",
+ "owner": "Ihsan Gercek",
+ "street": "Rheinische Straße 28",
+ "city": "42781 Haan",
+ "officeTel": "+4915222753000",
+ "officeNum": "+49 152 22 75 3000",
+ "email": "kontakt@falschgetankt24.com",
+ "waText": "Hallo, ich habe falsch getankt und brauche Hilfe. Mein Standort: ",
+ "soon": {
+  "rm": {
+   "center": [
+    50.1109,
+    8.6821
+   ],
+   "radiusKm": 60,
+   "fallback": "west"
+  }
+ }
 }

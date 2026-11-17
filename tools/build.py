@@ -5,9 +5,11 @@
 import json, re, sys, html as htmlmod, urllib.parse, pathlib, shutil
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DARK = ("--brand-ab:#FF8A1F;--paper:#051A1E;--surface:#0A2A31;--ink:#EAF3F1;--muted:#9FB9BC;--line:#1A424A;--line-strong:#356B75;"
-        "--sign:#0C4C57;--board:#0A323A;--link:#7AD3DF;--danger:#FF9B8C;--danger-bg:#3B1713;--ok:#7BDCA8;--ok-bg:#0E3525;"
-        "--shadow:0 18px 50px rgba(0,0,0,.55);color-scheme:dark")
+DARK = ("--brand-ab:#FF8A1F;--paper:#051A1E;--surface:#0A2A31;--tint:#0F363E;--ink:#EAF3F1;--muted:#9FB9BC;--line:#1A424A;--line-strong:#356B75;"
+        "--sign:#0C4C57;--sign-hi:#136876;--sign-lo:#083A43;--board:#0A323A;--foot-a:#062A31;--foot-b:#041D22;--link:#7AD3DF;"
+        "--danger:#FF9B8C;--danger-bg:#3B1713;--ok:#7BDCA8;--ok-bg:#0E3525;"
+        "--shadow:0 18px 50px rgba(0,0,0,.55);--shadow-card:0 1px 2px rgba(0,0,0,.35),0 16px 36px -22px rgba(0,0,0,.8);"
+        "--shadow-sign:0 2px 4px rgba(0,0,0,.3),0 30px 60px -30px rgba(0,0,0,.85);color-scheme:dark")
 FAVICON = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' rx='46' fill='#0B4650'/>"
     "<g transform='translate(100 100) scale(.9) translate(-113 -125)'><path d='M139 50A64 64 0 0 1 87.8 166.9' fill='none' stroke='#FF8A1F' stroke-width='17' stroke-linecap='round'/>"
     "<path d='M98.4 144 53.6 155.8 83 191.6z' fill='#FF8A1F'/><g transform='translate(-6 -9) rotate(-24 108 92)' fill='none' stroke='#fff' stroke-linecap='round' stroke-linejoin='round'>"
@@ -23,12 +25,13 @@ def build(cfg, mode, out):
     if cfg.get("brandVw"):
         css = css.replace("  --brand-ab:#E36C00;", "  --brand-ab:#E36C00;\n  --brand-vw:%s;" % cfg["brandVw"], 1)
     strings = (ROOT / "src/strings.js").read_text(encoding="utf-8")
+    geo = (ROOT / "src/geo.js").read_text(encoding="utf-8")
     app = (ROOT / "src/app.js").read_text(encoding="utf-8")
-    jscfg = {"regions": cfg["regions"], "price": cfg["price"], "waText": cfg["waText"]}
+    jscfg = {"regions": cfg["regions"], "soon": cfg.get("soon", {}), "price": cfg["price"], "waText": cfg["waText"]}
     app = app.replace("/*CFG*/", json.dumps(jscfg, ensure_ascii=False))
     if mode == "site":
         app = re.sub(r"\n\s*window\.__tank = .*?;\n", "\n", app)
-    page = page.replace("/*CSS*/", css).replace("/*JS*/", strings + "\n" + app)
+    page = page.replace("/*CSS*/", css).replace("/*JS*/", strings + "\n" + geo + "\n" + app)
 
     url = "https://" + cfg["domain"] + "/"
     canon = cfg.get("canonical", url)
@@ -77,11 +80,27 @@ def build(cfg, mode, out):
     if left:
         sys.exit("Unersetzte Platzhalter: %s" % left)
     keys = set(re.findall(r'data-i18n(?:-aria|-ph)?="([^"]+)"', page))
+    i18n = strings.split("var CHAT")[0]
+    have = {}
+    for lang in ("de", "en", "tr"):
+        block = re.search(r"\n  %s: \{(.*?)\n  \}" % lang, i18n, re.S).group(1)
+        have[lang] = set(re.findall(r'^\s*"([^"]+)":', block, re.M))
     for lang in ("en", "tr"):
-        block = re.search(r"\n  %s: \{(.*?)\n  \}" % lang, strings, re.S).group(1)
-        miss = sorted(keys - set(re.findall(r'^\s*"([^"]+)":', block, re.M)))
+        miss = sorted(keys - have[lang])
         if miss:
             sys.exit("Fehlende Übersetzung (%s): %s" % (lang, miss))
+        only = sorted((have["de"] - have[lang]) | ({k for k in have[lang] if k.startswith(("loc.", "st."))} - have["de"] - keys))
+        if only:
+            sys.exit("Schlüssel nur in einer Sprache (%s): %s" % (lang, only))
+    chat = "var CHAT" + strings.split("var CHAT")[1]
+    ck = {}
+    for lang in ("de", "en", "tr"):
+        block = re.search(r"\n  %s: \{(.*?)\n  \}" % lang, chat, re.S).group(1)
+        ck[lang] = set(re.findall(r'^\s*"([^"]+)":', block, re.M))
+    for lang in ("en", "tr"):
+        d = sorted(ck["de"] ^ ck[lang])
+        if d:
+            sys.exit("Chat-Schlüssel weichen ab (%s): %s" % (lang, d))
 
     out.mkdir(parents=True, exist_ok=True)
     for sub in ("fonts", "icons"):

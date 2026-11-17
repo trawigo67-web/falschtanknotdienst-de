@@ -17,3 +17,9 @@ Dieser Zweig enthält die Quelltexte. Die veröffentlichten Seiten liegen jeweil
 1. Text oder Angabe in `src/` oder `config.json` ändern.
 2. Beide Seiten bauen (siehe oben).
 3. Inhalt von `out/<domain>/` in den Zweig `main` des passenden Repositorys kopieren, committen, pushen.
+
+## Standort-Weiche (seit 17.11.2026)
+- `assets/geo/de-states-ne10m.geojson`: Grenzen der 16 Bundesländer aus Natural Earth 1:10m (gemeinfrei).
+- `python3 -I tools/geo.py` erzeugt daraus `src/geo.js` (vereinfacht, gemeinsame Grenzen bleiben lückenlos).
+- `config.json` → `soon.rm`: Region Rhein-Main als „Bald“ (Mittelpunkt Frankfurt, Radius 60 km). Wenn die eigene Nummer da ist, wird daraus ein drittes Gebiet.
+- Tests: `tools/geo_test.py` (90 Orte), `tools/check_layout.py` (Breiten, Sprachen, Standort-Zustände), `tools/device_test.py` (Android- und iPhone-Profile), `tools/nlu_test.py` (Chat).
