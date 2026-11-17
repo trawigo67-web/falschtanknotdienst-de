@@ -33,7 +33,7 @@ async def run_device(p, b, name, shots):
     await pg.goto(URL); await pg.wait_for_timeout(500)
     st = await hero_state(pg)
     check(name, "kein seitliches Scrollen", st["sw"] <= st["vw"], st)
-    check(name, "Start: zwei Nummern", len(st["main"]) == 2 and st["main"][0]["href"] == "tel:+491742432222" and st["main"][1]["href"] == "tel:+491704044555", st["main"])
+    check(name, "Start: drei Nummern", len(st["main"]) == 3 and st["main"][0]["href"] == "tel:+491742432222" and st["main"][1]["href"] == "tel:+491704044555" and st["main"][2]["href"] == "tel:+4915211303570", st["main"])
     check(name, "Start: Beschriftung Jetzt anrufen", all(m["label"] == "Jetzt anrufen" for m in st["main"]))
     check(name, "Standort-Knopf im ersten Bildschirm", st["locBox"][1] <= st["vh"], st["locBox"])
     check(name, "erste Nummer im ersten Bildschirm", st["main"][0]["box"][1] <= st["vh"], (st["main"][0]["box"], st["vh"]))
@@ -42,13 +42,13 @@ async def run_device(p, b, name, shots):
     # 2) Freigabe verweigert
     await pg.tap("#callpanel [data-locate]"); await pg.wait_for_timeout(700)
     st = await hero_state(pg)
-    check(name, "verweigert: Hinweis und beide Nummern", st["loc"] in ("denied", "fail") and st["status"] != "" and len(st["main"]) == 2, st)
+    check(name, "verweigert: Hinweis und alle Nummern", st["loc"] in ("denied", "fail") and st["status"] != "" and len(st["main"]) == 3, st)
     # 3) Freigabe erteilt: München
     await ctx.grant_permissions(["geolocation"]); await ctx.set_geolocation(MUC)
     await pg.tap("#callpanel [data-locate]"); await pg.wait_for_timeout(700)
     st = await hero_state(pg)
     check(name, "München: nur Bayern-Nummer", st["loc"] == "ok" and len(st["main"]) == 1 and st["main"][0]["href"] == "tel:+491704044555" and st["main"][0]["where"] == "Ihr Einsatzteam für Bayern" and st["title"] == "Bayern", st)
-    check(name, "München: andere Nummer bleibt erreichbar", st["other"] == ["tel:+491742432222"], st["other"])
+    check(name, "München: andere Nummer bleibt erreichbar", st["other"] == ["tel:+491742432222", "tel:+4915211303570"], st["other"])
     check(name, "München: Nummer im ersten Bildschirm", st["main"][0]["box"][1] <= st["vh"], st["main"][0]["box"])
     # WhatsApp enthält Standort-Link und geht an die Bayern-Nummer
     await pg.evaluate("window.addEventListener('click', e => { const a = e.target.closest && e.target.closest('a[href^=\\'https://wa.me\\']'); if (a) { e.preventDefault(); window.__wa = a.href; } })")
@@ -61,11 +61,11 @@ async def run_device(p, b, name, shots):
     # 4) Frankfurt: West-Nummer und Rhein-Main-Hinweis
     await ctx.set_geolocation(FFM); await pg.tap("#callpanel [data-locate]"); await pg.wait_for_timeout(700)
     st = await hero_state(pg)
-    check(name, "Frankfurt: West-Nummer und Bald-Hinweis", st["title"] == "Hessen" and len(st["main"]) == 1 and st["main"][0]["href"] == "tel:+491742432222" and "Rhein-Main" in st["status"], st)
+    check(name, "Frankfurt: Rhein-Main-Team", st["title"] == "Hessen" and len(st["main"]) == 1 and st["main"][0]["href"] == "tel:+4915211303570" and "Rhein-Main" in st["main"][0]["where"], st)
     # 5) Stuttgart: anderes Bundesland, beide Nummern
     await ctx.set_geolocation(STR); await pg.tap("#callpanel [data-locate]"); await pg.wait_for_timeout(700)
     st = await hero_state(pg)
-    check(name, "Stuttgart: beide Nummern mit Hinweis", st["title"] == "Baden-Württemberg" and len(st["main"]) == 2 and st["status"] != "", st)
+    check(name, "Stuttgart: alle Nummern mit Hinweis", st["title"] == "Baden-Württemberg" and len(st["main"]) == 3 and st["status"] != "", st)
     await ctx.close()
 
     # 6) Gebietsauswahl über die feste Leiste, Standort im Blatt
@@ -77,7 +77,7 @@ async def run_device(p, b, name, shots):
     check(name, "feste Anruf-Leiste sichtbar", bar["on"] and bar["bottom"] <= bar["vh"] + 1 and bar["callH"] >= 44, bar)
     await pg.tap("#stickybar .stickybar-call"); await pg.wait_for_timeout(400)
     sh = await pg.evaluate("(() => { const s = document.querySelector('#sheet'); const c = s.querySelector('.sheet-card').getBoundingClientRect(); return { open: !s.hidden, rows: [...s.querySelectorAll('.sheet-row')].filter(r => r.offsetParent).map(r => r.getAttribute('href')), top: Math.round(c.top), bottom: Math.round(c.bottom), vh: innerHeight }; })()")
-    check(name, "Gebietsauswahl offen mit drei Zeilen", sh["open"] and sh["rows"] == ["tel:+491742432222", "tel:+491704044555", "tel:+491742432222"] and sh["top"] >= 0 and sh["bottom"] <= sh["vh"] + 1, sh)
+    check(name, "Gebietsauswahl offen mit vier Zeilen", sh["open"] and sh["rows"] == ["tel:+491742432222", "tel:+491704044555", "tel:+4915211303570", "tel:+491742432222"] and sh["top"] >= 0 and sh["bottom"] <= sh["vh"] + 1, sh)
     await ctx.grant_permissions(["geolocation"]); await ctx.set_geolocation(CGN)
     await pg.tap("#sheet [data-locate]"); await pg.wait_for_timeout(700)
     sh = await pg.evaluate("(() => { const s = document.querySelector('#sheet'); return [...s.querySelectorAll('.sheet-row')].filter(r => r.offsetParent).map(r => r.getAttribute('href')); })()")
@@ -122,7 +122,7 @@ async def run_device(p, b, name, shots):
         r = await pg.evaluate("""() => ({ dir: document.documentElement.dir, h1: document.querySelector('h1').innerText, flag: document.querySelector('[data-lang-flag]').getAttribute('href'),
           calls: [...document.querySelectorAll('#callpanel .btn-call')].map(a => a.getAttribute('href')), num: document.querySelector('#callpanel .num').textContent,
           numDir: getComputedStyle(document.querySelector('#callpanel .num')).direction, sw: document.documentElement.scrollWidth, vw: innerWidth, open: document.querySelector('.lang').classList.contains('is-open') })""")
-        check(name, "Sprache %s" % code, r["dir"] == ("rtl" if rtl else "ltr") and h1part in r["h1"] and r["flag"] == "#f-" + code and r["calls"] == ["tel:+491742432222", "tel:+491704044555"] and r["num"] == "0174 243 22 22" and r["numDir"] == "ltr" and r["sw"] <= r["vw"] and not r["open"], r)
+        check(name, "Sprache %s" % code, r["dir"] == ("rtl" if rtl else "ltr") and h1part in r["h1"] and r["flag"] == "#f-" + code and r["calls"] == ["tel:+491742432222", "tel:+491704044555", "tel:+4915211303570"] and r["num"] == "0174 243 22 22" and r["numDir"] == "ltr" and r["sw"] <= r["vw"] and not r["open"], r)
     await ctx.close()
     check(name, "keine Skriptfehler", not errs, errs[:3])
 

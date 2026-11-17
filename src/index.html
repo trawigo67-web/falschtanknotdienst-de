@@ -143,6 +143,10 @@
           <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
           <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{BY_NUM}}</span><span class="where" data-i18n="region.by">Bayern</span></span>
         </a>
+        <a class="btn-call" href="tel:{{RM_TEL}}" data-region="rm">
+          <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
+          <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{RM_NUM}}</span><span class="where" data-i18n="region.rm">Frankfurt und Rhein-Main</span></span>
+        </a>
         <div class="callpanel-more">
           <a class="btn btn-ghost btn-wa-ghost" href="https://wa.me/{{WEST_WA}}?text={{WA_TEXT}}" data-open-sheet="wa" rel="noopener">
             <svg class="ico" aria-hidden="true"><use href="#i-bubble"/></svg><span data-i18n="cta.wa">WhatsApp</span>
@@ -152,7 +156,6 @@
           </button>
         </div>
         <p class="callpanel-note" data-i18n="hero.note">Den Festpreis nennen wir Ihnen am Telefon. Sie stehen in einem anderen Bundesland? Rufen Sie trotzdem an.</p>
-        <a class="callpanel-soon" href="#gebiet"><span class="soon-tag" data-i18n="soon.tag">Bald</span><span data-i18n="hero.soon">Eigenes Team für Frankfurt und Rhein-Main</span></a>
       </div>
     </div>
   </section>
@@ -312,6 +315,14 @@
         <p data-i18n="prices.n2">Sie erhalten eine Rechnung. Ob Ihr Schutzbrief oder Ihre Versicherung etwas übernimmt, hängt von Ihrem Vertrag ab.</p>
         <p data-i18n="prices.n3">Transporter, Motorrad oder ein anderes Fahrzeug? Den Preis erfahren Sie ebenfalls direkt am Telefon.</p>
       </div>
+      <div class="pay">
+        <h3 data-i18n="prices.pay.h">So können Sie bezahlen</h3>
+        <ul class="pay-list">
+          <li data-i18n="prices.pay.cash">Bar</li>
+          <li data-i18n="prices.pay.instant">Echtzeit-Überweisung</li>
+          <li>PayPal</li><li>Visa</li><li>Mastercard</li><li>American Express</li><li>Maestro</li>
+        </ul>
+      </div>
     </div>
   </section>
 
@@ -336,14 +347,13 @@
           <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{BY_NUM}}</span></span>
         </a>
       </div>
-      <div class="area area-soon" id="rhein-main">
-        <h3><span data-i18n="area.rm.h">Rhein-Main</span> <span class="soon-tag" data-i18n="soon.tag">Bald</span></h3>
+      <div class="area area-new" id="rhein-main">
+        <h3><span data-i18n="area.rm.h">Rhein-Main</span> <span class="soon-tag" data-i18n="soon.tag">Neu</span></h3>
         <p data-i18n="area.rm.p">Frankfurt am Main, Offenbach, Darmstadt, Wiesbaden, Mainz, Hanau, Bad Homburg, Rüsselsheim, Friedberg, Gießen, Wetzlar, Limburg, Bensheim und Worms. Dazu der weitere Umkreis bis etwa 100 Kilometer, zum Beispiel Mannheim, Ludwigshafen, Heidelberg, Marburg, Fulda und Koblenz.</p>
-        <p class="area-soon-lead" data-i18n="area.rm.soon">Hier sind wir bald mit eigenem Team und eigener Telefonnummer vor Ort.</p>
-        <p class="area-soon-note" data-i18n="area.rm.note">Bis die neue Nummer da ist, hilft Ihnen diese weiter:</p>
-        <a class="btn-call btn-call-s" href="tel:{{WEST_TEL}}" data-region="west">
+        <p class="area-new-lead" data-i18n="area.rm.soon">Eigenes Team mit eigener Nummer, rund um die Uhr.</p>
+        <a class="btn-call btn-call-s" href="tel:{{RM_TEL}}" data-region="rm">
           <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
-          <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{WEST_NUM}}</span></span>
+          <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{RM_NUM}}</span></span>
         </a>
       </div>
     </div>
@@ -400,7 +410,7 @@
       </details>
       <details>
         <summary><span data-i18n="faq.q5">Wie kann ich bezahlen?</span><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg></summary>
-        <p data-i18n="faq.a5">Direkt vor Ort, bar oder per Echtzeit-Überweisung.</p>
+        <p data-i18n="faq.a5">Direkt vor Ort: bar, per Echtzeit-Überweisung, mit PayPal oder mit Karte (Visa, Mastercard, American Express, Maestro).</p>
       </details>
       <details>
         <summary><span data-i18n="faq.q6">Welche Fahrzeuge pumpen Sie ab?</span><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg></summary>
@@ -432,6 +442,10 @@
           <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
           <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{BY_NUM}}</span><span class="where" data-i18n="region.by">Bayern</span></span>
         </a>
+        <a class="btn-call" href="tel:{{RM_TEL}}" data-region="rm">
+          <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
+          <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{RM_NUM}}</span><span class="where" data-i18n="region.rm">Frankfurt und Rhein-Main</span></span>
+        </a>
         <div class="callpanel-more">
           <a class="btn btn-ghost btn-wa-ghost" href="https://wa.me/{{WEST_WA}}?text={{WA_TEXT}}" data-open-sheet="wa" rel="noopener">
             <svg class="ico" aria-hidden="true"><use href="#i-bubble"/></svg><span data-i18n="cta.wa">WhatsApp</span>
@@ -454,7 +468,7 @@
   <p>{{COMPANY}}<br>Inhaber: {{OWNER}}<br>{{STREET}}<br>{{CITY}}</p>
   <h2>Kontakt</h2>
   <p>Telefon: <a href="tel:{{OFFICE_TEL}}">{{OFFICE_NUM}}</a><br>E-Mail: <a href="mailto:{{EMAIL}}">{{EMAIL}}</a></p>
-  <p>Einsatz-Hotline NRW, Hessen und Rheinland-Pfalz: <a href="tel:{{WEST_TEL}}">{{WEST_NUM}}</a><br>Einsatz-Hotline Bayern: <a href="tel:{{BY_TEL}}">{{BY_NUM}}</a><br>Rhein-Main: eigene Nummer in Vorbereitung, bis dahin über die Hotline für Hessen</p>
+  <p>Einsatz-Hotline NRW, Hessen und Rheinland-Pfalz: <a href="tel:{{WEST_TEL}}">{{WEST_NUM}}</a><br>Einsatz-Hotline Bayern: <a href="tel:{{BY_TEL}}">{{BY_NUM}}</a><br>Einsatz-Hotline Frankfurt und Rhein-Main: <a href="tel:{{RM_TEL}}">{{RM_NUM}}</a></p>
   <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
   <p>{{OWNER}}, Anschrift wie oben</p>
   <h2>Verbraucherstreitbeilegung</h2>
@@ -541,6 +555,7 @@
     <p class="loc-status" role="status" hidden></p>
     <a class="sheet-row" data-sheet-region="west" href="tel:{{WEST_TEL}}"><span class="sheet-where" data-i18n="region.west">NRW, Hessen, Rheinland-Pfalz</span><span class="num">{{WEST_NUM}}</span></a>
     <a class="sheet-row" data-sheet-region="by" href="tel:{{BY_TEL}}"><span class="sheet-where" data-i18n="region.by">Bayern</span><span class="num">{{BY_NUM}}</span></a>
+    <a class="sheet-row" data-sheet-region="rm" href="tel:{{RM_TEL}}"><span class="sheet-where" data-i18n="region.rm">Frankfurt und Rhein-Main</span><span class="num">{{RM_NUM}}</span></a>
     <a class="sheet-row sheet-row-other" data-sheet-region="other" href="tel:{{WEST_TEL}}"><span class="sheet-where" data-i18n="region.other">Anderes Bundesland</span><span class="num">{{WEST_NUM}}</span></a>
     <p class="sheet-note" data-i18n="sheet.note.call">Tippen Sie auf Ihr Gebiet. Ihr Telefon wählt dann die passende Nummer.</p>
   </div>

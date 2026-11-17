@@ -149,7 +149,7 @@
   var FRAMED = (function () { try { return window.self !== window.top; } catch (e) { return true; } })();
   var GEO_OK = !!navigator.geolocation && window.isSecureContext !== false && !FRAMED; /* eingebettet (Vorschau) sperrt der Browser die Abfrage */
   if (!GEO_OK) { root.classList.add('no-geo'); }
-  function setRegion(r) { if (r === 'west' || r === 'by') { region = r; } }
+  function setRegion(r) { if (r === 'west' || r === 'by' || r === 'rm') { region = r; } }
   function soonAt(lat, lon) {
     var hit = null;
     Object.keys(CFG.soon || {}).forEach(function (k) {
@@ -162,7 +162,7 @@
     var code = stateAt(lat, lon);
     var r = code === 'BY' ? 'by' : (STATE_KEY[code] ? 'west' : null);
     var soon = (code && code !== 'BY') ? soonAt(lat, lon) : null;
-    if (soon && !r) { r = CFG.soon[soon].fallback || 'west'; }
+    if (soon) { r = CFG.soon[soon].region || soon; soon = r; } /* Raum Frankfurt/Rhein-Main hat ein eigenes Team */
     return { lat: lat, lon: lon, acc: acc, code: code, region: r, soon: soon };
   }
   function waDefault() {
@@ -183,7 +183,7 @@
     var mine = (locState === 'ok' && fix) ? fix.region : null;
     $$('[data-sheet-region]', sheet).forEach(function (a) {
       var key = a.getAttribute('data-sheet-region');
-      var r = key === 'by' ? 'by' : 'west';
+      var r = CFG.regions[key] ? key : 'west';
       if (sheetMode === 'wa') { a.href = waHref(r); a.rel = 'noopener'; } else { a.href = 'tel:' + CFG.regions[r].tel; a.removeAttribute('rel'); }
       a.classList.toggle('is-hidden', !!mine && key !== mine);
     });
@@ -203,7 +203,6 @@
     });
     if (ok) {
       if (!fix.code) { status = t('loc.abroad'); }
-      else if (fix.soon) { status = t('loc.soon'); }
       else if (!fix.region) { status = t('loc.other'); }
     } else if (locState === 'denied') { status = t('loc.denied'); }
     else if (locState === 'fail') { status = t('loc.fail'); }
@@ -211,7 +210,7 @@
     $$('.callpanel .btn-call').forEach(function (a) {
       var r = a.getAttribute('data-region'), where = $('.where', a);
       a.classList.toggle('is-other', !!mine && r !== mine);
-      if (where) { where.innerHTML = (mine && r === mine && STATE_KEY[fix.code]) ? t('loc.team').replace('{state}', t('st.' + fix.code)) : defaultText(where); }
+      if (where) { where.innerHTML = (mine && r === mine && r === 'rm') ? t('loc.team').replace('{state}', t('loc.rm')) : ((mine && r === mine && STATE_KEY[fix.code]) ? t('loc.team').replace('{state}', t('st.' + fix.code)) : defaultText(where)); }
     });
     if (region) {
       $$('a[data-open-sheet]').forEach(function (a) { a.href = a.getAttribute('data-open-sheet') === 'wa' ? waHref(region) : 'tel:' + CFG.regions[region].tel; });
@@ -344,7 +343,7 @@
       S.placeDone = true;
       S.code = fix.code;
       S.soon = fix.soon;
-      S.state = STATE_KEY[fix.code] || 'other';
+      S.state = fix.region === 'rm' ? 'rm' : (STATE_KEY[fix.code] || 'other');
       S.region = fix.region || 'west';
     }
   }
@@ -407,7 +406,7 @@
   function callCard() {
     enqueue(function () {
       var card = el('div', 'result');
-      (region ? [region] : ['west', 'by']).forEach(function (r) { card.appendChild(callBtn(r)); });
+      (region ? [region] : ['west', 'rm', 'by']).forEach(function (r) { card.appendChild(callBtn(r)); });
       logEl.appendChild(card);
     }, 250);
   }
@@ -456,13 +455,13 @@
   function setState(s) {
     S.state = s;
     S.code = null;
-    S.region = s === 'by' ? 'by' : 'west';
+    S.region = s === 'by' ? 'by' : (s === 'rm' ? 'rm' : 'west');
     if (s !== 'other') { setRegion(S.region); }
   }
   function askRegion() {
     S.asked = 'region';
     say(T('askRegion'));
-    chips((GEO_OK ? [{ label: T('p.share'), cls: 'chip-loc', go: locateChat }] : []).concat(['nrw', 'he', 'rp', 'by', 'other'].map(function (s) {
+    chips((GEO_OK ? [{ label: T('p.share'), cls: 'chip-loc', go: locateChat }] : []).concat(['nrw', 'rm', 'he', 'rp', 'by', 'other'].map(function (s) {
       return { label: T('r.' + s), go: function () { setState(s); next(); } };
     })));
   }
@@ -486,7 +485,7 @@
         S.soon = fix.soon;
         S.code = fix.code;
         if (fix.code) {
-          setState(STATE_KEY[fix.code] || 'other');
+          setState(fix.region === 'rm' ? 'rm' : (STATE_KEY[fix.code] || 'other'));
           S.code = fix.code;
           say(T('geo.ok', { m: String(fix.acc) }) + ' ' + T('geo.in', { state: t('st.' + fix.code) }));
         } else {
@@ -532,7 +531,6 @@
       });
       card.appendChild(dl);
       card.appendChild(el('p', '', T(S.state === 'other' ? 'res.other' : 'res.lead')));
-      if (S.soon && S.state !== 'other') { card.appendChild(el('p', 'result-soon', T('res.soon'))); }
       card.appendChild(callBtn(r));
       var wa = el('a', 'btn btn-wa', BUBBLE + '<span>' + T('res.wa') + '</span>');
       wa.href = waHref(r, waMessage());
@@ -651,12 +649,12 @@
     ['by', 'aschaffenburg', 'Aschaffenburg'], ['by', 'passau', 'Passau'], ['by', 'schweinfurt', 'Schweinfurt'], ['by', 'straubing', 'Straubing'], ['by', 'freising', 'Freising']
   ].map(function (c) { return { state: c[0], rx: new RegExp('\\b(?:' + c[1] + ')\\b'), name: c[2] }; });
   /* Orte, für die bald das eigene Team Rhein-Main zuständig ist */
-  var SOON_RX = /\b(?:frankfurt|offenbach|darmstadt|wiesbaden|mainz|hanau|russelsheim|ruesselsheim|bad homburg|oberursel|eschborn|neu-isenburg|neu isenburg|dreieich|rodgau|bad vilbel|maintal|bad nauheim|dietzenbach|giessen|wetzlar|limburg|bensheim|worms|rhein-main|rhein main|rhine-main)\b/;
+  var SOON_RX = /\b(?:frankfurt|offenbach|darmstadt|wiesbaden|mainz|hanau|russelsheim|ruesselsheim|bad homburg|oberursel|eschborn|neu-isenburg|neu isenburg|dreieich|rodgau|bad vilbel|maintal|bad nauheim|dietzenbach|giessen|wetzlar|limburg|bensheim|worms|heidelberg|mannheim|schwetzingen|weinheim|rhein-main|rhein main|rhine-main)\b/;
   function plzSoon(p) {
     var a = parseInt(p.slice(0, 2), 10);
     var b = parseInt(p.slice(0, 3), 10);
     if (b >= 637 && b <= 639) { return null; }
-    if (a === 60 || a === 61 || a === 63 || a === 64 || a === 65 || (b >= 550 && b <= 552) || (b >= 353 && b <= 355)) { return 'rm'; }
+    if (a === 60 || a === 61 || a === 63 || a === 64 || a === 65 || (b >= 550 && b <= 552) || (b >= 353 && b <= 355) || b === 681 || b === 682 || b === 683 || b === 691) { return 'rm'; }
     return null;
   }
 
@@ -735,7 +733,7 @@
       S.place = text.slice(0, 160);
       S.placeDone = true;
       if (u.state && !S.state) { setState(u.state); }
-      if (u.soon) { S.soon = u.soon; }
+      if (u.soon) { S.soon = u.soon; if (S.state !== 'by') { setState('rm'); } }
       next();
       return;
     }
@@ -746,7 +744,7 @@
     if (u.vehicle && !S.vehicle) { S.vehicle = u.vehicle; got.push(T('v.' + u.vehicle)); }
     if (u.state && !S.state) { setState(u.state); got.push((u.place ? u.place + ', ' : '') + T('r.' + u.state)); }
     if (u.place && !S.place) { S.place = u.place; }
-    if (u.soon) { S.soon = u.soon; }
+    if (u.soon) { S.soon = u.soon; if (S.state !== 'by') { setState('rm'); } }
     if (got.length) { say(T('understood', { list: got.join(', ') })); }
     if (engineNew) { advise(); }
     if (u.intent) {

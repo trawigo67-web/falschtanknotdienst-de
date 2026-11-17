@@ -32,7 +32,7 @@ async def main():
             r = await pg.evaluate(JS)
             good = r["sw"] <= r["vw"] and not r["bad"] and not r["small"] and r["gap"] >= 6 and r["lang"] == lang and not errs
             if fix and fix[0] in ("BY", "HE+bald", "NW"): good = good and r["visibleCalls"] == 1
-            if fix and fix[0] in ("BW", "MV", "Ausland"): good = good and r["visibleCalls"] == 2
+            if fix and fix[0] in ("BW", "MV", "Ausland"): good = good and r["visibleCalls"] == 3
             ok += good; bad += (not good)
             if not good: print("!!", label, w, lang, r, errs[:2])
             await ctx.close()

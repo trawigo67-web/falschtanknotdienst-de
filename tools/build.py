@@ -49,6 +49,7 @@ def build(cfg, mode, out):
         "ALIAS": cfg.get("alias", ""),
         "FAVICON": "data:image/svg+xml," + urllib.parse.quote(FAVICON, safe="/:=' ,()-."),
         "WEST_TEL": cfg["regions"]["west"]["tel"], "WEST_NUM": cfg["regions"]["west"]["num"], "WEST_WA": cfg["regions"]["west"]["wa"],
+        "RM_TEL": cfg["regions"]["rm"]["tel"], "RM_NUM": cfg["regions"]["rm"]["num"], "RM_WA": cfg["regions"]["rm"]["wa"],
         "BY_TEL": cfg["regions"]["by"]["tel"], "BY_NUM": cfg["regions"]["by"]["num"], "BY_WA": cfg["regions"]["by"]["wa"],
         "WA_TEXT": urllib.parse.quote(cfg["waText"]),
         "PRICE_CAR": cfg["price"]["car"], "PRICE_CAMPER": cfg["price"]["camper"],
@@ -72,6 +73,7 @@ def build(cfg, mode, out):
             "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "00:00", "closes": "23:59"},
         "contactPoint": [
             {"@type": "ContactPoint", "telephone": cfg["regions"]["west"]["tel"], "contactType": "emergency", "areaServed": ["DE-NW", "DE-HE", "DE-RP"], "availableLanguage": ["de", "en", "tr"]},
+            {"@type": "ContactPoint", "telephone": cfg["regions"]["rm"]["tel"], "contactType": "emergency", "areaServed": ["DE-HE", "DE-RP"], "availableLanguage": ["de", "en", "tr"]},
             {"@type": "ContactPoint", "telephone": cfg["regions"]["by"]["tel"], "contactType": "emergency", "areaServed": "DE-BY", "availableLanguage": ["de", "en", "tr"]},
         ],
     }, {"@context": "https://schema.org", "@type": "FAQPage",

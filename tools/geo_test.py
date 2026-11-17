@@ -21,10 +21,10 @@ CASES = [
  ("Innsbruck", 47.269, 11.404, None), ("Luxemburg", 49.611, 6.130, None), ("Nordsee", 54.5, 7.0, None),
 ]
 ROUTE = [  # Ort, lat, lon, erwartete Region, erwartetes "bald"
- ("München", 48.137, 11.575, "by", None), ("Aschaffenburg", 49.974, 9.150, "by", None), ("Frankfurt", 50.111, 8.682, "west", "rm"), ("Darmstadt", 49.873, 8.651, "west", "rm"),
- ("Mainz", 49.993, 8.247, "west", "rm"), ("Wiesbaden", 50.083, 8.240, "west", "rm"), ("Kassel", 51.313, 9.479, "west", None), ("Köln", 50.938, 6.960, "west", None),
+ ("München", 48.137, 11.575, "by", None), ("Aschaffenburg", 49.974, 9.150, "by", None), ("Frankfurt", 50.111, 8.682, "rm", "rm"), ("Darmstadt", 49.873, 8.651, "rm", "rm"),
+ ("Mainz", 49.993, 8.247, "rm", "rm"), ("Wiesbaden", 50.083, 8.240, "rm", "rm"), ("Kassel", 51.313, 9.479, "west", None), ("Köln", 50.938, 6.960, "west", None),
  ("Koblenz", 50.357, 7.589, "west", None), ("Stuttgart", 48.776, 9.183, None, None), ("Berlin", 52.520, 13.405, None, None), ("Zürich", 47.377, 8.540, None, None),
- ("Gießen", 50.584, 8.678, "west", "rm"), ("Fulda", 50.555, 9.680, "west", None),
+ ("Gießen", 50.584, 8.678, "rm", "rm"), ("Heidelberg", 49.398, 8.672, "rm", "rm"), ("Mannheim", 49.487, 8.466, "rm", "rm"), ("Karlsruhe", 49.007, 8.404, None, None), ("Stuttgart", 48.776, 9.183, None, None), ("Fulda", 50.555, 9.680, "west", None),
 ]
 async def main():
     async with async_playwright() as p:
