@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seite nicht gefunden | {{DISPLAY}}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="{{FAVICON}}">
+<style>
+:root{color-scheme:light dark}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0B4650;color:#fff;font:400 1.0625rem/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding:24px}
+main{max-width:30rem;display:grid;gap:16px}
+h1{font-size:2rem;line-height:1.1;margin:0}
+p{margin:0;color:#CDE2E3}
+a{display:block;text-decoration:none;font-weight:700;border-radius:14px;padding:14px 18px}
+.call{background:#FF8A1F;color:#1C1305;font-size:1.5rem}
+.call small{display:block;font-size:.95rem;font-weight:600}
+.home{border:2px solid rgba(255,255,255,.7);color:#fff;text-align:center}
+</style>
+</head>
+<body>
+<main>
+  <h1>Diese Seite gibt es nicht.</h1>
+  <p>Falsch getankt? Bitte den Motor aus lassen und anrufen. Wir sind rund um die Uhr erreichbar.</p>
+  <a class="call" href="tel:{{WEST_TEL}}">{{WEST_NUM}}<small>NRW, Hessen, Rheinland-Pfalz</small></a>
+  <a class="call" href="tel:{{BY_TEL}}">{{BY_NUM}}<small>Bayern</small></a>
+  <a class="home" href="/">Zur Startseite von {{BRAND}}{{TLD}}</a>
+</main>
+</body>
+</html>
