@@ -23,3 +23,9 @@ Dieser Zweig enthält die Quelltexte. Die veröffentlichten Seiten liegen jeweil
 - `python3 -I tools/geo.py` erzeugt daraus `src/geo.js` (vereinfacht, gemeinsame Grenzen bleiben lückenlos).
 - `config.json` → `soon.rm`: Region Rhein-Main als „Bald“ (Mittelpunkt Frankfurt, Radius 60 km). Wenn die eigene Nummer da ist, wird daraus ein drittes Gebiet.
 - Tests: `tools/geo_test.py` (90 Orte), `tools/check_layout.py` (Breiten, Sprachen, Standort-Zustände), `tools/device_test.py` (Android- und iPhone-Profile), `tools/nlu_test.py` (Chat).
+
+## Sprachen (seit 17.11.2026)
+- Deutsch steht im HTML, Englisch und Türkisch in `src/strings.js`. Arabisch, Russisch, Ukrainisch, Polnisch und Rumänisch liegen als Pakete in `src/lang/` und werden erst geladen, wenn sie gewählt werden.
+- `node tools/check_lang.js` prüft alle Pakete gegen die englische Vorlage (Schlüssel, Platzhalter, HTML-Tags).
+- Neue Sprache: Paket in `src/lang/` anlegen, Kürzel in `LANGS` (src/app.js) eintragen, Knopf und Flagge in `src/index.html` ergänzen.
+- `python3 tools/fontfix.py` erzeugt die kyrillischen Schnitte mit internationalen Buchstabenformen (nötig für Ukrainisch).

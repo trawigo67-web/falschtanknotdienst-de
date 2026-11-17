@@ -15,7 +15,24 @@
   function isWide() { return !!(window.matchMedia && window.matchMedia('(min-width: 760px)').matches); }
 
   /* ---------- Sprache ---------- */
+  var LANGS = ['de', 'en', 'tr', 'ar', 'ru', 'uk', 'pl', 'ro'];
+  var RTL = { ar: true };
+  var LANG_DE = { en: 'Englisch', tr: 'Türkisch', ar: 'Arabisch', ru: 'Russisch', uk: 'Ukrainisch', pl: 'Polnisch', ro: 'Rumänisch' };
+  var packWait = {};
   var lang = 'de';
+  /* Deutsch, Englisch und Türkisch stehen in der Seite; die übrigen Sprachen werden bei Bedarf nachgeladen */
+  function loadPack(l, cb) {
+    if (l === 'de' || I18N[l]) { cb(true); return; }
+    if (packWait[l]) { packWait[l].push(cb); return; }
+    packWait[l] = [cb];
+    var sc = doc.createElement('script');
+    function done(ok) { var cbs = packWait[l]; packWait[l] = null; cbs.forEach(function (f) { f(ok && !!I18N[l] && !!CHAT[l]); }); }
+    sc.src = 'lang/' + l + '.js?v=' + ((CFG.packs && CFG.packs[l]) || '1');
+    sc.async = true;
+    sc.onload = function () { done(true); };
+    sc.onerror = function () { done(false); };
+    doc.head.appendChild(sc);
+  }
   var orig = { html: new Map(), aria: new Map(), ph: new Map(), title: doc.title };
   var metaDesc = $('meta[name="description"]');
   orig.desc = metaDesc ? metaDesc.getAttribute('content') : '';
@@ -30,9 +47,15 @@
   }
 
   function setLang(l, persist) {
-    if (l !== 'de' && !I18N[l]) { l = 'de'; }
+    if (LANGS.indexOf(l) < 0) { l = 'de'; }
+    if (l !== 'de' && !I18N[l]) {
+      root.classList.add('lang-loading');
+      loadPack(l, function (ok) { root.classList.remove('lang-loading'); if (ok) { setLang(l, persist); } });
+      return;
+    }
     lang = l;
     root.lang = l;
+    root.dir = RTL[l] ? 'rtl' : 'ltr';
     var d = I18N[l] || {};
     $$('[data-i18n]').forEach(function (el) {
       var v = l === 'de' ? orig.html.get(el) : d[el.getAttribute('data-i18n')];
@@ -48,9 +71,12 @@
     });
     doc.title = l === 'de' ? orig.title : (d['meta.title'] || orig.title);
     if (metaDesc) { metaDesc.setAttribute('content', l === 'de' ? orig.desc : (d['meta.desc'] || orig.desc)); }
-    $$('.lang-list button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === l)); });
+    $$('[data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === l)); });
     var cur = $('[data-lang-current]');
-    if (cur) { cur.textContent = l.toUpperCase(); }
+    var curName = $('.lang-list [data-lang="' + l + '"] .name');
+    if (cur && curName) { cur.textContent = curName.textContent; }
+    var curFlag = $('[data-lang-flag]');
+    if (curFlag) { curFlag.setAttribute('href', '#f-' + l); }
     $$('.legal-lang').forEach(function (p) { p.hidden = (l === 'de'); });
     if (persist) { store.set('lang', l); }
     renderLocator();
@@ -119,6 +145,9 @@
   var locState = 'idle';  /* idle | busy | ok | denied | fail */
   var locBusy = false;
   var locCbs = [];
+  /* Standortabfrage gibt es nur über eine verschlüsselte Verbindung; sonst bleibt der Knopf weg */
+  var GEO_OK = !!navigator.geolocation && window.isSecureContext !== false;
+  if (!GEO_OK) { root.classList.add('no-geo'); }
   function setRegion(r) { if (r === 'west' || r === 'by') { region = r; } }
   function soonAt(lat, lon) {
     var hit = null;
@@ -137,6 +166,7 @@
   }
   function waDefault() {
     var text = CFG.waText;
+    if (lang !== 'de' && LANG_DE[lang]) { text = text.replace('Mein Standort: ', 'Ich spreche ' + LANG_DE[lang] + '. Mein Standort: '); }
     if (fix && locState === 'ok') { text += 'https://maps.google.com/?q=' + fix.lat.toFixed(5) + ',' + fix.lon.toFixed(5); }
     return text;
   }
@@ -197,7 +227,7 @@
       var cbs = locCbs; locCbs = [];
       cbs.forEach(function (cb) { cb(success); });
     }
-    if (!navigator.geolocation) { finish('fail', false); return; }
+    if (!GEO_OK) { finish('fail', false); return; }
     var fresh = locState === 'ok'; /* erneutes Antippen: Standort neu messen statt den letzten zu nehmen */
     locBusy = true;
     if (!auto) { locState = 'busy'; renderLocator(); }
@@ -431,17 +461,16 @@
   function askRegion() {
     S.asked = 'region';
     say(T('askRegion'));
-    chips([{ label: T('p.share'), cls: 'chip-loc', go: locateChat }].concat(['nrw', 'he', 'rp', 'by', 'other'].map(function (s) {
+    chips((GEO_OK ? [{ label: T('p.share'), cls: 'chip-loc', go: locateChat }] : []).concat(['nrw', 'he', 'rp', 'by', 'other'].map(function (s) {
       return { label: T('r.' + s), go: function () { setState(s); next(); } };
     })));
   }
   function askPlace() {
     S.asked = 'place';
     say(T('askPlace'));
-    chips([
-      { label: T('p.geo'), go: locateChat },
+    chips((GEO_OK ? [{ label: T('p.geo'), go: locateChat }] : []).concat([
       { label: T('p.skip'), go: function () { S.placeDone = true; next(); } }
-    ]);
+    ]));
   }
   function geoFail() { S.asked = 'place'; say(T('geo.fail')); }
   function locateChat() {
@@ -483,8 +512,7 @@
     var place = S.place || '';
     if (S.geo) { place = (place ? place + ', ' : '') + 'https://maps.google.com/?q=' + S.geo.lat.toFixed(5) + ',' + S.geo.lon.toFixed(5); }
     lines.push('Standort: ' + (place || 'nenne ich am Telefon'));
-    if (lang === 'en') { lines.push('Sprache: Englisch'); }
-    if (lang === 'tr') { lines.push('Sprache: Türkisch'); }
+    if (lang !== 'de' && LANG_DE[lang]) { lines.push('Sprache: ' + LANG_DE[lang]); }
     return lines.join('\n');
   }
   function showResult() {
@@ -817,7 +845,7 @@
       langToggle.setAttribute('aria-expanded', String(open));
       return;
     }
-    var langBtn = target.closest('.lang-list button');
+    var langBtn = target.closest('[data-lang]');
     if (langBtn) { setLang(langBtn.getAttribute('data-lang'), true); }
     if (langBox && langBox.classList.contains('is-open')) {
       langBox.classList.remove('is-open');
@@ -854,16 +882,20 @@
   (function () {
     var saved = store.get('lang');
     var l = 'de';
-    if (saved === 'de' || saved === 'en' || saved === 'tr') { l = saved; }
+    if (LANGS.indexOf(saved) >= 0) { l = saved; }
     else if (!/bot|crawl|spider|lighthouse|headless/i.test(navigator.userAgent || '')) {
-      var nav = String(navigator.language || 'de').slice(0, 2).toLowerCase();
-      if (nav === 'tr' || nav === 'en') { l = nav; }
+      /* erste Sprache aus den Browser-Einstellungen, die es auf dieser Seite gibt */
+      var prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'de'];
+      for (var pi = 0; pi < prefs.length; pi++) {
+        var code = String(prefs[pi]).slice(0, 2).toLowerCase();
+        if (LANGS.indexOf(code) >= 0) { l = code; break; }
+      }
     }
     if (l !== 'de') { setLang(l, false); }
   })();
   renderLocator();
   /* Wurde die Standortfreigabe für diese Seite schon früher erteilt, gleich die passende Nummer zeigen */
-  if (navigator.geolocation && navigator.permissions && navigator.permissions.query) {
+  if (GEO_OK && navigator.permissions && navigator.permissions.query) {
     try {
       navigator.permissions.query({ name: 'geolocation' }).then(function (st) { if (st && st.state === 'granted') { locate(true); } }, function () { /* Abfrage nicht möglich */ });
     } catch (e) { /* ältere Browser */ }

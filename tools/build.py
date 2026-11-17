@@ -2,7 +2,7 @@
 """Baut die Website aus src/.
    build.py preview                 -> dist/ (Vorschau, noindex)
    build.py site <site.json> <out>  -> fertige Website für eine Domain"""
-import json, re, sys, html as htmlmod, urllib.parse, pathlib, shutil
+import json, re, sys, html as htmlmod, urllib.parse, pathlib, shutil, hashlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DARK = ("--brand-ab:#FF8A1F;--paper:#051A1E;--surface:#0A2A31;--tint:#0F363E;--ink:#EAF3F1;--muted:#9FB9BC;--line:#1A424A;--line-strong:#356B75;"
@@ -27,7 +27,10 @@ def build(cfg, mode, out):
     strings = (ROOT / "src/strings.js").read_text(encoding="utf-8")
     geo = (ROOT / "src/geo.js").read_text(encoding="utf-8")
     app = (ROOT / "src/app.js").read_text(encoding="utf-8")
-    jscfg = {"regions": cfg["regions"], "soon": cfg.get("soon", {}), "price": cfg["price"], "waText": cfg["waText"]}
+    packs = {f.stem: f.read_text(encoding="utf-8") for f in sorted((ROOT / "src/lang").glob("*.js"))}
+    stamp = lambda t: hashlib.sha1((t + cfg["domain"] + cfg.get("alias", "") + mode).encode("utf-8")).hexdigest()[:8]
+    jscfg = {"regions": cfg["regions"], "soon": cfg.get("soon", {}), "price": cfg["price"], "waText": cfg["waText"],
+             "packs": {k: stamp(t) for k, t in packs.items()}}
     app = app.replace("/*CFG*/", json.dumps(jscfg, ensure_ascii=False))
     if mode == "site":
         app = re.sub(r"\n\s*window\.__tank = .*?;\n", "\n", app)
@@ -113,6 +116,17 @@ def build(cfg, mode, out):
                           {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]}
     (out / "site.webmanifest").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     (out / "index.html").write_text(page, encoding="utf-8")
+    # Sprachpakete, die erst bei Bedarf geladen werden
+    (out / "lang").mkdir(exist_ok=True)
+    for code, text in packs.items():
+        for k, val in rep.items():
+            text = text.replace("{{%s}}" % k, val)
+        if not rep["ALIAS"]:
+            text = re.sub(r'\n\s*"footer\.alias": "[^"]*",', "", text)
+        rest = sorted(set(re.findall(r"\{\{[A-Z_]+\}\}", text)))
+        if rest:
+            sys.exit("Unersetzte Platzhalter im Sprachpaket %s: %s" % (code, rest))
+        (out / "lang" / (code + ".js")).write_text(text, encoding="utf-8")
     if mode == "site":
         (out / "CNAME").write_text(cfg["domain"] + "\n", encoding="utf-8")
         (out / ".nojekyll").write_text("", encoding="utf-8")

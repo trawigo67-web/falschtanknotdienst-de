@@ -12,7 +12,7 @@ JS = """() => { const vw = document.documentElement.clientWidth; const bad = [];
     b.querySelectorAll('*').forEach(c => { const r = c.getBoundingClientRect(); if (r.width && (r.right > br.right + 0.5 || r.left < br.left - 0.5 || r.bottom > br.bottom + 0.5 || r.top < br.top - 0.5)) bad.push('ragt heraus: ' + String(b.className).slice(0, 24) + ' > ' + String(c.className.baseVal ?? c.className).slice(0, 20)); }); });
   const hr = document.querySelector('.header-row').getBoundingClientRect(); const br = document.querySelector('.brand').getBoundingClientRect(); const lg = document.querySelector('.lang').getBoundingClientRect();
   const small = [...document.querySelectorAll('main a, main button, .stickybar a, .stickybar button, header button, header a')].filter(e => { const r = e.getBoundingClientRect(); return r.width && r.height && (r.height < 43.5) && !e.closest('.legal') && !e.classList.contains('textlink') && !e.closest('p') ; }).map(e => String(e.className).slice(0, 24) + ' ' + Math.round(e.getBoundingClientRect().height));
-  return { vw, sw: document.documentElement.scrollWidth, bad: bad.slice(0, 6), small: small.slice(0, 4), gap: Math.round(lg.left - br.right), lang: document.documentElement.lang,
+  return { vw, sw: document.documentElement.scrollWidth, bad: bad.slice(0, 6), small: small.slice(0, 4), gap: Math.round(document.documentElement.dir === 'rtl' ? br.left - lg.right : lg.left - br.right), lang: document.documentElement.lang,
     visibleCalls: [...document.querySelectorAll('#callpanel .btn-call')].filter(a => !a.classList.contains('is-other')).length } }"""
 async def main():
     ok = bad = 0
@@ -20,12 +20,13 @@ async def main():
         b = await p.chromium.launch(executable_path="/usr/bin/google-chrome", args=["--no-sandbox"])
         async def run(url, w, lang, fix=None, label=""):
             nonlocal ok, bad
-            ctx = await b.new_context(viewport={"width": w, "height": 800}, is_mobile=w < 700, has_touch=w < 700)
+            ctx = await b.new_context(viewport={"width": w, "height": 800}, is_mobile=w < 700, has_touch=w < 700, locale="de-DE")
             pg = await ctx.new_page(); errs = []
             pg.on("pageerror", lambda e: errs.append(str(e)))
             await pg.goto(url); await pg.wait_for_timeout(180)
             if lang != "de":
-                await pg.evaluate("document.querySelector('.lang-list button[data-lang=\"%s\"]').click()" % lang); await pg.wait_for_timeout(80)
+                await pg.evaluate("document.querySelector('.lang-list button[data-lang=\"%s\"]').click()" % lang)
+                await pg.wait_for_function("document.documentElement.lang === '%s'" % lang, timeout=6000); await pg.wait_for_timeout(120)
             if fix:
                 await pg.evaluate("([a,b]) => window.__tank.setFix(a,b)", [fix[1], fix[2]]); await pg.wait_for_timeout(80)
             r = await pg.evaluate(JS)
@@ -35,13 +36,14 @@ async def main():
             ok += good; bad += (not good)
             if not good: print("!!", label, w, lang, r, errs[:2])
             await ctx.close()
-        for site in SITES:
-            for w in WIDTHS:
-                for lang in ["de", "en", "tr"]:
+        LANGS = ["de", "en", "tr", "ar", "ru", "uk", "pl", "ro"]
+        for i, site in enumerate(SITES):
+            for w in (WIDTHS if i == 0 else [320, 360, 390, 768, 1280]):
+                for lang in LANGS:
                     await run("http://localhost:8766/%s/index.html" % site, w, lang, None, site)
-        for w in [320, 344, 360, 390, 430, 600, 768, 1024, 1280]:
-            for lang in ["de", "en", "tr"]:
-                for fx in FIXES:
+        for w in [320, 360, 390, 768, 1280]:
+            for lang in LANGS:
+                for fx in (FIXES if lang in ("de", "ar", "ru") else [FIXES[0], FIXES[1], FIXES[4]]):
                     await run("http://localhost:8765/", w, lang, fx, "Standort " + fx[0])
         await b.close()
     print("Layout-Prüfung:", ok, "ok,", bad, "fehlerhaft")

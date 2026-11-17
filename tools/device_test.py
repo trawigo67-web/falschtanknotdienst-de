@@ -110,6 +110,20 @@ async def run_device(p, b, name, shots):
     hero = await hero_state(pg)
     check(name, "Chat-Standort gilt auch auf der Seite", hero["loc"] == "ok" and len(hero["main"]) == 1 and hero["main"][0]["href"] == "tel:+491704044555", hero)
     await ctx.close()
+
+    # 9) Sprachwahl über die Flagge: Arabisch (rechts nach links) und Ukrainisch
+    ctx = await b.new_context(**d, locale="de-DE"); pg = await ctx.new_page(); pg.set_default_timeout(8000)
+    pg.on("pageerror", lambda e: errs.append(str(e)))
+    await pg.goto(URL); await pg.wait_for_timeout(400)
+    for code, h1part, rtl in (("ar", "المحرك", True), ("uk", "двигун", False), ("de", "Motor aus", False)):
+        await pg.tap(".lang-current"); await pg.wait_for_timeout(250)
+        await pg.tap(".lang-list [data-lang=%s]" % code)
+        await pg.wait_for_function("document.documentElement.lang === '%s'" % code, timeout=6000); await pg.wait_for_timeout(300)
+        r = await pg.evaluate("""() => ({ dir: document.documentElement.dir, h1: document.querySelector('h1').innerText, flag: document.querySelector('[data-lang-flag]').getAttribute('href'),
+          calls: [...document.querySelectorAll('#callpanel .btn-call')].map(a => a.getAttribute('href')), num: document.querySelector('#callpanel .num').textContent,
+          numDir: getComputedStyle(document.querySelector('#callpanel .num')).direction, sw: document.documentElement.scrollWidth, vw: innerWidth, open: document.querySelector('.lang').classList.contains('is-open') })""")
+        check(name, "Sprache %s" % code, r["dir"] == ("rtl" if rtl else "ltr") and h1part in r["h1"] and r["flag"] == "#f-" + code and r["calls"] == ["tel:+491742432222", "tel:+491704044555"] and r["num"] == "0174 243 22 22" and r["numDir"] == "ltr" and r["sw"] <= r["vw"] and not r["open"], r)
+    await ctx.close()
     check(name, "keine Skriptfehler", not errs, errs[:3])
 
 async def main():
@@ -132,7 +146,7 @@ async def main():
     for im in ims:
         sheet.paste(im, (x, 0)); x += im.width + 12
     sheet.save("/tmp/neu/geraete.png")
-    print("Prüfpunkte je Gerät: 21 |", "ALLES OK" if not fails else "%d FEHLER" % len(fails))
+    print("Prüfpunkte je Gerät: 24 |", "ALLES OK" if not fails else "%d FEHLER" % len(fails))
     for f in fails: print("  -", f[:600])
     sys.exit(1 if fails else 0)
 asyncio.run(main())
