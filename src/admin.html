@@ -59,7 +59,8 @@ button.link{background:none;border:0;padding:0;color:var(--muted);text-decoratio
     <h2 id="h-prev">Vorschau auf dem Handy</h2>
     <div class="phone"><iframe id="frame" title="Vorschau der Website mit dem ausgewählten Farbthema" src="../"></iframe></div>
     <div class="save">
-      <label class="check"><input type="checkbox" id="both" checked> Auf beiden Websites übernehmen</label>
+      <label class="check"><input type="checkbox" id="both"> Auch auf der anderen Website übernehmen</label>
+      <p class="hint">Ohne Haken ändert sich nur {{DISPLAY}}.</p>
       <div id="keybox">
         <label for="key">Zugangsschlüssel</label>
         <input type="password" id="key" autocomplete="off" spellcheck="false">
@@ -90,7 +91,7 @@ button.link{background:none;border:0;padding:0;color:var(--muted);text-decoratio
     var t = THEMES[k];
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'theme'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false'); b.dataset.key = k;
-    b.innerHTML = '<span class="swatch" style="background:linear-gradient(155deg,' + t['sign-hi'] + ',' + t['sign-lo'] + ')"><span class="dot"></span>' +
+    b.innerHTML = '<span class="swatch" style="background:linear-gradient(155deg,' + t['sign-hi'] + ',' + t['sign-lo'] + ')"><span class="dot" style="background:' + (t.mark || '#fff') + '"></span>' +
       '<span class="pill" style="background:' + t.signal + ';color:' + t['on-signal'] + '">Jetzt anrufen</span></span>' +
       '<strong></strong><span class="note"></span>';
     b.querySelector('strong').textContent = t.name;

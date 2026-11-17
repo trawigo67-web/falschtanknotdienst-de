@@ -29,7 +29,7 @@ def theme_css(themes):
         if key == "petrol":
             continue
         sel = 'html[data-theme="%s"]' % key
-        out.append(sel + "{" + "".join("--%s:%s;" % (v, t[v]) for v in ALWAYS) + "}")
+        out.append(sel + "{" + "".join("--%s:%s;" % (v, t[v]) for v in ALWAYS) + ("--mark:%s;" % t["mark"] if "mark" in t else "") + "}")
         out.append("@media (prefers-color-scheme:light){" + sel + "{" + "".join("--%s:%s;" % (v, t[v]) for v in LIGHT) + "}}")
         out.append("@media (prefers-color-scheme:dark){" + sel + "{--brand-ab:%s;--link:%s}}" % (t["brand-ab-dark"], t["signal-hi"]))
     return "\n".join(out)
