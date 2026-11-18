@@ -77,7 +77,11 @@
     });
     doc.title = l === 'de' ? orig.title : (d['meta.title'] || orig.title);
     if (metaDesc) { metaDesc.setAttribute('content', l === 'de' ? orig.desc : (d['meta.desc'] || orig.desc)); }
-    $$('[data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === l)); });
+    $$('[data-lang]').forEach(function (b) {
+      var on = b.getAttribute('data-lang') === l;
+      if (b.tagName === 'A') { if (on) { b.setAttribute('aria-current', 'page'); } else { b.removeAttribute('aria-current'); } }
+      else { b.setAttribute('aria-pressed', String(on)); }
+    });
     var cur = $('[data-lang-current]');
     var curName = $('.lang-list [data-lang="' + l + '"] .name');
     if (cur && curName) { cur.textContent = curName.textContent; }

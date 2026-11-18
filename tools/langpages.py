@@ -114,6 +114,9 @@ def footer_links(page, prefix_de="/"):
         b = m.group(0)
         b = re.sub(r'<button type="button" data-lang="([a-z]{2})"', lambda mm: '<a href="%s" hreflang="%s" data-lang="%s"' % (
             prefix_de if mm.group(1) == "de" else "/%s/" % mm.group(1), mm.group(1), mm.group(1)), b)
+        # Links kennzeichnen die aktuelle Sprache mit aria-current, nicht mit aria-pressed (das gehört zu Knöpfen)
+        b = re.sub(r'(<a href="[^"]*" hreflang="[a-z]{2}" data-lang="[a-z]{2}" lang="[a-z]{2}") aria-pressed="(true|false)"',
+                   lambda mm: mm.group(1) + (' aria-current="page"' if mm.group(2) == "true" else ""), b)
         return b.replace("</button>", "</a>")
     return re.sub(r'<div class="footer-langs".*?</div>', block, page, count=1, flags=re.S)
 
@@ -141,6 +144,8 @@ def make(page, l, d, names, urls, canon_self, rtl):
     # Sprachwahl: aktuelle Sprache anzeigen
     p = re.sub(r'(data-lang="[a-z]{2}"[^>]*aria-pressed=")(true|false)(")', lambda m: m.group(1) + "false" + m.group(3), p)
     p = re.sub(r'(data-lang="%s"[^>]*aria-pressed=")false(")' % l, r"\1true\2", p)
+    p = p.replace(' aria-current="page"', '')
+    p = re.sub(r'(<a href="[^"]*" hreflang="%s" data-lang="%s" lang="%s")' % (l, l, l), r'\1 aria-current="page"', p, count=1)
     p = re.sub(r'(<use data-lang-flag href="#f-)[a-z]{2}(")', r"\g<1>%s\2" % l, p, count=1)
     p = re.sub(r'(<span class="lang-name" data-lang-current>)[^<]*', lambda m: m.group(1) + names.get(l, l), p, count=1)
     # Hinweis „Impressum nur auf Deutsch“ zeigen
