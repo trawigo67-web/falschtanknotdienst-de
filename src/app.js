@@ -151,14 +151,29 @@
   if (!GEO_OK) { root.classList.add('no-geo'); }
   /* Farbe der Browserleiste folgt dem gewählten Farbthema */
   (function () {
-    var cs = getComputedStyle(root);
-    function v(name) { return cs.getPropertyValue(name).trim(); }
-    var dark = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    var tc = doc.querySelector('meta[name="theme-color"][media*="' + (dark ? 'dark' : 'light') + '"]');
-    var paper = v('--paper');
-    /* im Dunkelmodus kann der Wert eine Mischfarbe sein: dann die fertig berechnete Hintergrundfarbe nehmen */
-    if (paper.indexOf('color-mix') === 0) { paper = getComputedStyle(doc.body).backgroundColor; }
-    if (tc && paper) { tc.setAttribute('content', paper); }
+    function bar() {
+      var cs = getComputedStyle(root);
+      function v(name) { return cs.getPropertyValue(name).trim(); }
+      var dark = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      var tc = doc.querySelector('meta[name="theme-color"][media*="' + (dark ? 'dark' : 'light') + '"]');
+      var paper = v('--paper');
+      /* im Dunkelmodus kann der Wert eine Mischfarbe sein: dann die fertig berechnete Hintergrundfarbe nehmen */
+      if (paper.indexOf('color-mix') === 0) { paper = getComputedStyle(doc.body).backgroundColor; }
+      if (tc && paper) { tc.setAttribute('content', paper); }
+    }
+    bar();
+    /* Handys halten die Seite bis zu zehn Minuten im Zwischenspeicher. Damit ein im Admin-Bereich
+       umgestelltes Farbthema trotzdem sofort ankommt, wird das aktive Thema frisch nachgelesen. */
+    if (/[?&]theme=/.test(location.search) || !window.fetch || !/^https?:$/.test(location.protocol)) { return; }
+    fetch('theme.txt', { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+      t = t.trim();
+      if (!/^[a-z]+$/.test(t) || t === root.getAttribute('data-theme')) { return; }
+      root.setAttribute('data-theme', t);
+      [].forEach.call(doc.querySelectorAll('link[rel~=icon],link[rel=apple-touch-icon],link[rel=manifest]'), function (l) {
+        l.setAttribute('href', l.getAttribute('href').replace(/^brand\/[a-z]+\//, 'brand/' + t + '/'));
+      });
+      bar();
+    }).catch(function () { /* ohne Netz bleibt das Thema der Seite */ });
   })();
   function setRegion(r) { if (r === 'west' || r === 'by' || r === 'rm') { region = r; } }
   function soonAt(lat, lon) {
