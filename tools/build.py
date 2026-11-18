@@ -216,7 +216,7 @@ def build(cfg, mode, out):
     canon_base = canon if canon.endswith("/") else canon + "/"
     for p in plist:
         d = out / p["slug"]; d.mkdir(parents=True, exist_ok=True)
-        (d / "index.html").write_text(pagesmod.render(cfg, p, base_css, theme, url, canon_base, display, cfg["brandHtml"], plist), encoding="utf-8")
+        (d / "index.html").write_text(pagesmod.render(cfg, p, base_css, theme, url, canon_base, display, cfg["brandHtml"], plist, tc=(th["paper"], th["paper-dark"])), encoding="utf-8")
     if mode == "site":
         urls = [url] + [url + p["slug"] + "/" for p in plist]
         if canon_base == url:

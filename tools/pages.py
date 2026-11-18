@@ -229,7 +229,7 @@ a:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
 """
 
 
-def render(cfg, p, base_css, theme, url, canon_base, display, brand_html, all_pages):
+def render(cfg, p, base_css, theme, url, canon_base, display, brand_html, all_pages, tc=("#FFFFFF", "#000000")):
     path = "/%s/" % p["slug"]
     title = p["title"].format(brand=display)
     canon = canon_base + p["slug"] + "/"
@@ -264,13 +264,22 @@ def render(cfg, p, base_css, theme, url, canon_base, display, brand_html, all_pa
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="%(canon)s">
 <meta name="format-detection" content="telephone=no">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="%(tc_light)s">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="%(tc_dark)s">
 <meta property="og:type" content="article">
 <meta property="og:locale" content="de_DE">
 <meta property="og:site_name" content="%(display)s">
 <meta property="og:title" content="%(h1)s">
 <meta property="og:description" content="%(desc)s">
-<meta property="og:url" content="%(canon)s">
+<meta property="og:url" content="%(own)s">
 <meta property="og:image" content="%(url)sbrand/%(theme)s/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="%(display)s: Falsch getankt? Motor aus lassen.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/%(theme)s/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="96x96" href="/brand/%(theme)s/icon-96.png">
 <link rel="icon" type="image/svg+xml" href="/brand/%(theme)s/icon.svg">
 <link rel="apple-touch-icon" href="/brand/%(theme)s/icon-180.png">
 <link rel="preload" href="/fonts/ssc-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -293,6 +302,7 @@ def render(cfg, p, base_css, theme, url, canon_base, display, brand_html, all_pa
 </body>
 </html>
 """ % dict(theme=theme, title=E(title), desc=E(p["desc"]), canon=canon, display=E(display), h1=E(p["h1"]), url=url,
+           own=url + p["slug"] + "/", tc_light=tc[0], tc_dark=tc[1],
            css=base_css + CSS, ld=json.dumps(ld, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/"),
            brand_html=brand_html, crumbs=crumb_html, lead=E(p["lead"]), calls=call_box(cfg, p.get("calls")), body=p["body"],
            more=more, company=E(cfg["company"]), stel=sticky_tel, slbl=E(sticky_lbl))

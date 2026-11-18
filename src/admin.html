@@ -117,66 +117,70 @@ button.link{background:none;border:0;padding:0;color:var(--muted);text-decoratio
   /* Text sicher nach Base64 und zurück (Umlaute, Arabisch, Kyrillisch) */
   function toB64(s) { var bytes = new TextEncoder().encode(s), bin = ''; for (var i = 0; i < bytes.length; i += 32768) { bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 32768)); } return btoa(bin); }
   function fromB64(b) { var bin = atob(b.replace(/\s/g, '')), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) { u[i] = bin.charCodeAt(i); } return new TextDecoder().decode(u); }
-  function api(token, repo, path, opts) {
+  function gh(token, repo, path, opts) {
     opts = opts || {};
-    /* ?ref=main: Browser schicken Abrufe, deren Adresse auf favicon.ico endet, sonst gar nicht erst ab.
-       Beim Lesen wählt es den Zweig main, beim Schreiben ignoriert GitHub den Zusatz (dort gilt "branch" im Inhalt). */
-    if ((opts.method || 'GET') !== 'GET' && opts.body && !opts.body.branch) { opts.body.branch = 'main'; }
-    return fetch('https://api.github.com/repos/' + repo + '/contents/' + path + '?ref=main', {
+    return fetch('https://api.github.com/repos/' + repo + '/' + path, {
       method: opts.method || 'GET', cache: 'no-store',
       headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
       body: opts.body ? JSON.stringify(opts.body) : undefined
     }).then(function (r) {
-      if (r.status === 404 && opts.allow404) { return null; }
       if (!r.ok) { var e = new Error('http ' + r.status); e.status = r.status; throw e; }
       return r.json();
     });
   }
-  function apply(token, repo, theme) {
+  /* Eine HTML-Seite auf das Thema umstellen: Thema, Verweise auf brand/<thema>/ (Symbole, Teilen-Bild, Manifest)
+     und die Farbe der Browserleiste (steht fest im HTML, damit sie auch ohne JavaScript stimmt) */
+  function rewrite(html, theme) {
+    var t = THEMES[theme];
+    return html.replace(/(<html[^>]*data-theme=")[a-z]+(")/, '$1' + theme + '$2')
+      .replace(/(\bbrand\/)[a-z]+(\/)/g, '$1' + theme + '$2')
+      .replace(/(<meta name="theme-color" media="\(prefers-color-scheme: light\)" content=")#[0-9A-Fa-f]{6}(")/, '$1' + t.paper + '$2')
+      .replace(/(<meta name="theme-color" media="\(prefers-color-scheme: dark\)" content=")#[0-9A-Fa-f]{6}(")/, '$1' + t['paper-dark'] + '$2');
+  }
+  /* Alle Seiten (Startseite, Unterseiten, Fehlerseite, Admin-Bereich), theme.txt, /favicon.ico und /og.png
+     in EINEM Schritt umstellen: kein halber Zwischenstand, und GitHub baut die Website nur einmal neu.
+     Neue Unterseiten sind automatisch dabei, weil jede HTML-Datei im Repository umgestellt wird. */
+  function apply(token, repo, theme, retried) {
     var msgText = 'Farbthema: ' + THEMES[theme].name + ' (Admin-Bereich)';
-    return api(token, repo, 'index.html').then(function (f) {
-      var html = fromB64(f.content);
-      /* Farbthema umstellen, dazu die Verweise auf App-Symbol, Teilen-Bild und Manifest (liegen je Thema unter brand/<thema>/) */
-      var next = html.replace(/(<html[^>]*data-theme=")[a-z]+(")/, '$1' + theme + '$2').replace(/(\bbrand\/)[a-z]+(\/)/g, '$1' + theme + '$2');
-      /* Farbe der Browserleiste (hell und dunkel) steht fest im HTML, damit sie auch ohne JavaScript stimmt */
-      next = next.replace(/(<meta name="theme-color" media="\(prefers-color-scheme: light\)" content=")#[0-9A-Fa-f]{6}(")/, '$1' + THEMES[theme].paper + '$2')
-                 .replace(/(<meta name="theme-color" media="\(prefers-color-scheme: dark\)" content=")#[0-9A-Fa-f]{6}(")/, '$1' + THEMES[theme]['paper-dark'] + '$2');
-      if (next === html && html.indexOf('data-theme="' + theme + '"') < 0) { throw new Error('marker'); }
-      if (next === html) { return; }
-      return api(token, repo, 'index.html', { method: 'PUT', body: { message: msgText, content: toB64(next), sha: f.sha } });
-    }).then(function () {
-      /* Symbole der Fehlerseite und des Admin-Bereichs mitziehen */
-      return ['404.html', 'admin/index.html'].reduce(function (p, path) {
+    var head, base, files = {}, changes = [];
+    return gh(token, repo, 'git/ref/heads/main').then(function (ref) {
+      head = ref.object.sha;
+      return gh(token, repo, 'git/commits/' + head);
+    }).then(function (c) {
+      base = c.tree.sha;
+      return gh(token, repo, 'git/trees/' + base + '?recursive=1');
+    }).then(function (tr) {
+      if (tr.truncated) { throw new Error('tree'); }
+      tr.tree.forEach(function (f) { if (f.type === 'blob') { files[f.path] = f; } });
+      if (!files['index.html']) { throw new Error('marker'); }
+      return Object.keys(files).filter(function (p) { return /\.html$/.test(p); }).reduce(function (p, path) {
         return p.then(function () {
-          return api(token, repo, path, { allow404: true }).then(function (f) {
-            if (!f) { return; }
-            var txt = fromB64(f.content), nx = txt.replace(/(\bbrand\/)[a-z]+(\/icon)/g, '$1' + theme + '$2');
-            if (nx === txt) { return; }
-            return api(token, repo, path, { method: 'PUT', body: { message: msgText, content: toB64(nx), sha: f.sha } });
+          return gh(token, repo, 'git/blobs/' + files[path].sha).then(function (b) {
+            var html = fromB64(b.content), next = rewrite(html, theme);
+            if (path === 'index.html' && next.indexOf('data-theme="' + theme + '"') < 0) { throw new Error('marker'); }
+            if (next !== html) { changes.push({ path: path, mode: files[path].mode, type: 'blob', content: next }); }
           });
         });
       }, Promise.resolve());
     }).then(function () {
-      /* Bilder unter der festen Adresse (/favicon.ico, /og.png) aus brand/<thema>/ übernehmen */
-      return ['favicon.ico', 'og.png'].reduce(function (p, name) {
-        return p.then(function () {
-          return api(token, repo, 'brand/' + theme + '/' + name, { allow404: true }).then(function (src) {
-            if (!src || !src.content) { return; }
-            return api(token, repo, name, { allow404: true }).then(function (cur) {
-              if (cur && cur.sha === src.sha) { return; }
-              var body = { message: msgText, content: src.content.replace(/\s/g, '') };
-              if (cur) { body.sha = cur.sha; }
-              return api(token, repo, name, { method: 'PUT', body: body });
-            });
-          });
-        });
-      }, Promise.resolve());
-    }).then(function () {
-      return api(token, repo, 'theme.txt', { allow404: true });
-    }).then(function (f) {
-      var body = { message: msgText, content: toB64(theme + '\n') };
-      if (f) { if (fromB64(f.content).trim() === theme) { return; } body.sha = f.sha; }
-      return api(token, repo, 'theme.txt', { method: 'PUT', body: body });
+      /* /favicon.ico und /og.png zeigen auf die fertigen Dateien des Themas unter brand/<thema>/ (kein Hochladen nötig) */
+      ['favicon.ico', 'og.png'].forEach(function (name) {
+        var src = files['brand/' + theme + '/' + name];
+        if (src && (!files[name] || files[name].sha !== src.sha)) { changes.push({ path: name, mode: '100644', type: 'blob', sha: src.sha }); }
+      });
+      return files['theme.txt'] ? gh(token, repo, 'git/blobs/' + files['theme.txt'].sha) : null;
+    }).then(function (b) {
+      if (!b || fromB64(b.content).trim() !== theme) { changes.push({ path: 'theme.txt', mode: '100644', type: 'blob', content: theme + '\n' }); }
+      if (!changes.length) { return null; }
+      return gh(token, repo, 'git/trees', { method: 'POST', body: { base_tree: base, tree: changes } }).then(function (tr) {
+        return gh(token, repo, 'git/commits', { method: 'POST', body: { message: msgText, tree: tr.sha, parents: [head] } });
+      }).then(function (c) {
+        return gh(token, repo, 'git/refs/heads/main', { method: 'PATCH', body: { sha: c.sha } });
+      });
+    }).catch(function (err) {
+      /* Hat in der Zwischenzeit jemand anderes etwas hochgeladen: einmal von vorn, auf dem neuen Stand */
+      if (err.status === 422 && !retried) { return apply(token, repo, theme, true); }
+      throw err;
     });
   }
   document.getElementById('save').addEventListener('click', function () {
@@ -195,7 +199,7 @@ button.link{background:none;border:0;padding:0;color:var(--muted);text-decoratio
       })
       .catch(function (e) {
         if (e.status === 401 || e.status === 403) { store(KEY, null); syncKey(); say('Der Zugangsschlüssel stimmt nicht oder ist abgelaufen. Bitte neu eingeben.', 'err'); }
-        else if (e.status === 409) { say('Gerade wurde gleichzeitig etwas geändert. Bitte in einer Minute noch einmal versuchen.', 'err'); }
+        else if (e.status === 409 || e.status === 422) { say('Gerade wurde gleichzeitig etwas geändert. Bitte in einer Minute noch einmal versuchen.', 'err'); }
         else { say('Das hat nicht geklappt. Bitte Internetverbindung prüfen und noch einmal versuchen.', 'err'); }
       })
       .then(function () { btn.disabled = false; });
