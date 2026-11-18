@@ -135,9 +135,24 @@ button.link{background:none;border:0;padding:0;color:var(--muted);text-decoratio
       var html = fromB64(f.content);
       /* Farbthema umstellen, dazu die Verweise auf App-Symbol, Teilen-Bild und Manifest (liegen je Thema unter brand/<thema>/) */
       var next = html.replace(/(<html[^>]*data-theme=")[a-z]+(")/, '$1' + theme + '$2').replace(/(\bbrand\/)[a-z]+(\/)/g, '$1' + theme + '$2');
+      /* Farbe der Browserleiste (hell und dunkel) steht fest im HTML, damit sie auch ohne JavaScript stimmt */
+      next = next.replace(/(<meta name="theme-color" media="\(prefers-color-scheme: light\)" content=")#[0-9A-Fa-f]{6}(")/, '$1' + THEMES[theme].paper + '$2')
+                 .replace(/(<meta name="theme-color" media="\(prefers-color-scheme: dark\)" content=")#[0-9A-Fa-f]{6}(")/, '$1' + THEMES[theme]['paper-dark'] + '$2');
       if (next === html && html.indexOf('data-theme="' + theme + '"') < 0) { throw new Error('marker'); }
       if (next === html) { return; }
       return api(token, repo, 'index.html', { method: 'PUT', body: { message: msgText, content: toB64(next), sha: f.sha } });
+    }).then(function () {
+      /* Symbole der Fehlerseite und des Admin-Bereichs mitziehen */
+      return ['404.html', 'admin/index.html'].reduce(function (p, path) {
+        return p.then(function () {
+          return api(token, repo, path, { allow404: true }).then(function (f) {
+            if (!f) { return; }
+            var txt = fromB64(f.content), nx = txt.replace(/(\bbrand\/)[a-z]+(\/icon)/g, '$1' + theme + '$2');
+            if (nx === txt) { return; }
+            return api(token, repo, path, { method: 'PUT', body: { message: msgText, content: toB64(nx), sha: f.sha } });
+          });
+        });
+      }, Promise.resolve());
     }).then(function () {
       return api(token, repo, 'theme.txt', { allow404: true });
     }).then(function (f) {

@@ -37,11 +37,18 @@ def theme_css(themes):
                "--line-strong:color-mix(in srgb,var(--sign-hi) 40%,#59616A);--muted:color-mix(in srgb,var(--sign-muted) 60%,#8E979F);--ink:#EDF1F4}}}")
     return "\n".join(out)
 
+def mix(a, b, wa):
+    """wie CSS color-mix(in srgb, a wa, b)"""
+    ca = [int(a[i:i + 2], 16) for i in (1, 3, 5)]; cb = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join("%02X" % round(x * wa + y * (1 - wa)) for x, y in zip(ca, cb))
+
 def build(cfg, mode, out):
     page = (ROOT / "src/index.html").read_text(encoding="utf-8")
     css = (ROOT / "src/style.css").read_text(encoding="utf-8").replace("/*DARK*/", DARK)
     themes = json.loads((ROOT / "src/themes.json").read_text(encoding="utf-8"))
     css += "\n" + theme_css(themes)
+    for k, t in themes.items():  # Leistenfarbe im Dunkelmodus, fest ins HTML, damit sie auch ohne JavaScript stimmt
+        t["paper-dark"] = "#051A1E" if k == "petrol" else mix(t["foot-b"], "#0A0C0E", .38)
     if cfg.get("brandVw"):
         css = css.replace("  --brand-ab:#E36C00;", "  --brand-ab:#E36C00;\n  --brand-vw:%s;" % cfg["brandVw"], 1)
     strings = (ROOT / "src/strings.js").read_text(encoding="utf-8")
@@ -72,11 +79,12 @@ def build(cfg, mode, out):
         "ROBOTS": "index, follow" if mode == "site" else "noindex, nofollow",
         "CANONICAL": '<link rel="canonical" href="%s">' % canon if mode == "site" else "",
         "OGURL": '<meta property="og:url" content="%s">' % url if mode == "site" else "",
-        "OGIMAGE": ('<meta property="og:image" content="%sbrand/%s/og.png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta name="twitter:card" content="summary_large_image">' % (url, theme)) if mode == "site" else "",
+        "OGIMAGE": ('<meta property="og:image" content="%sbrand/%s/og.png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta property="og:image:type" content="image/png">\n<meta property="og:image:alt" content="%s: Falsch getankt? Motor aus lassen.">\n<meta name="twitter:card" content="summary_large_image">' % (url, theme, htmlmod.escape(display))) if mode == "site" else "",
         "THEME": theme,
         "BRAND": cfg["brand"], "TLD": cfg["tld"], "BRAND_HTML": cfg["brandHtml"], "DISPLAY": display,
         "ALIAS": cfg.get("alias", ""),
         "TC_LIGHT": th["paper"],
+        "TC_DARK": th["paper-dark"],
         "C_SIGN": th["sign"], "C_SIGN_HI": th["sign-hi"], "C_SIGN_LO": th["sign-lo"], "C_SIGN_MUTED": th["sign-muted"],
         "C_SIGNAL": th["signal"], "C_ON_SIGNAL": th["on-signal"],
         "MARK_PLATE": marks.glyph(mark, th["sign"], th["sign"] if mark == "puls" else th.get("mark", th["signal"])),
