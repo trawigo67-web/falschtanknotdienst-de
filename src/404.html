@@ -5,25 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Seite nicht gefunden | {{DISPLAY}}</title>
 <meta name="robots" content="noindex">
-<link rel="icon" href="{{FAVICON}}">
+<link rel="icon" type="image/png" sizes="96x96" href="/brand/{{THEME}}/icon-96.png">
+<link rel="icon" type="image/svg+xml" href="/brand/{{THEME}}/icon.svg">
 <style>
 :root{color-scheme:light dark}
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0B4650;color:#fff;font:400 1.0625rem/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding:24px}
-main{max-width:30rem;display:grid;gap:16px}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:linear-gradient(155deg,{{C_SIGN_HI}},{{C_SIGN}} 44%,{{C_SIGN_LO}});color:#fff;font:400 1.0625rem/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding:24px}
+main{width:100%;max-width:30rem;display:grid;gap:14px}
+.logo{width:56px;height:56px;border-radius:15px;background:#fff;display:grid;place-items:center;margin-bottom:6px}
+.logo svg{width:48px;height:48px}
 h1{font-size:2rem;line-height:1.1;margin:0}
-p{margin:0;color:#CDE2E3}
-a{display:block;text-decoration:none;font-weight:700;border-radius:14px;padding:14px 18px}
-.call{background:#FF8A1F;color:#1C1305;font-size:1.5rem}
+p{margin:0 0 4px;color:{{C_SIGN_MUTED}}}
+a{display:block;text-decoration:none;font-weight:700;border-radius:14px;padding:13px 18px}
+.call{background:{{C_SIGNAL}};color:{{C_ON_SIGNAL}};font-size:1.5rem;font-variant-numeric:tabular-nums}
 .call small{display:block;font-size:.95rem;font-weight:600}
 .home{border:2px solid rgba(255,255,255,.7);color:#fff;text-align:center}
+a:focus-visible{outline:3px solid #fff;outline-offset:3px}
 </style>
 </head>
 <body>
 <main>
+  <span class="logo" aria-hidden="true"><svg viewBox="0 0 200 200">{{MARK_PLATE}}</svg></span>
   <h1>Diese Seite gibt es nicht.</h1>
   <p>Falsch getankt? Bitte den Motor aus lassen und anrufen. Wir sind rund um die Uhr erreichbar.</p>
   <a class="call" href="tel:{{WEST_TEL}}">{{WEST_NUM}}<small>NRW, Hessen, Rheinland-Pfalz</small></a>
   <a class="call" href="tel:{{BY_TEL}}">{{BY_NUM}}<small>Bayern</small></a>
+  <a class="call" href="tel:{{RM_TEL}}">{{RM_NUM}}<small>Frankfurt und Rhein-Main</small></a>
   <a class="home" href="/">Zur Startseite von {{BRAND}}{{TLD}}</a>
 </main>
 </body>

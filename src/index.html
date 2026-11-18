@@ -8,7 +8,7 @@
 <meta name="robots" content="{{ROBOTS}}">
 {{CANONICAL}}
 <meta name="format-detection" content="telephone=no">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F2F5F5">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="{{TC_LIGHT}}">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#051A1E">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="de_DE">
@@ -17,9 +17,11 @@
 <meta property="og:title" content="Falsch getankt? Motor aus lassen. Wir pumpen vor Ort ab.">
 <meta property="og:description" content="Mobiler Abpumpservice bei Falschbetankung. Rund um die Uhr, Festpreis vorab.">
 {{OGIMAGE}}
-<link rel="icon" href="{{FAVICON}}">
-<link rel="apple-touch-icon" href="icons/icon-180.png">
-<link rel="manifest" href="site.webmanifest">
+<link rel="icon" type="image/png" sizes="96x96" href="brand/{{THEME}}/icon-96.png">
+<link rel="icon" type="image/svg+xml" href="brand/{{THEME}}/icon.svg">
+<link rel="apple-touch-icon" href="brand/{{THEME}}/icon-180.png">
+<meta name="apple-mobile-web-app-title" content="{{DISPLAY}}">
+<link rel="manifest" href="brand/{{THEME}}/site.webmanifest">
 <link rel="preload" href="fonts/ssc-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/ss-latin.woff2" as="font" type="font/woff2" crossorigin>
 <script>(function(d){d.classList.remove('no-js');var m=/[?&]theme=([a-z]+)/.exec(location.search);if(m){d.setAttribute('data-theme',m[1]);}})(document.documentElement);</script>
@@ -45,6 +47,8 @@
     <symbol id="i-back" viewBox="0 0 24 24"><path d="M11 5l-7 7 7 7M4 12h16"/></symbol>
     <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.500"/><path d="M12 2.500v3M12 18.500v3M2.500 12h3M18.500 12h3"/><circle cx="12" cy="12" r="1.700" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.700 5.600 6.100.800-4.500 4.300 1.100 6.100L12 16.900 6.600 19.800l1.100-6.100L3.200 9.400l6.100-.800z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.500"/><path d="M12 7.300V12l3.200 2.100"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3.500 12.400V4.500a1 1 0 0 1 1-1h7.900a1 1 0 0 1 .700.300l7.100 7.100a1 1 0 0 1 0 1.400l-7.900 7.900a1 1 0 0 1-1.400 0l-7.100-7.100a1 1 0 0 1-.300-.700z"/><circle cx="8" cy="8" r="1.400" fill="currentColor" stroke="none"/></symbol>
     <!-- Flaggen für die Sprachwahl (vereinfacht, 24 x 16) -->
     <symbol id="f-de" viewBox="0 0 24 16"><rect width="24" height="16" fill="#FFCE00"/><rect width="24" height="10.670" fill="#DD0000"/><rect width="24" height="5.330" fill="#111"/></symbol>
     <clipPath id="cp-us"><path d="M0 0h24L0 16z"/></clipPath>
@@ -60,19 +64,15 @@
     <symbol id="f-uk" viewBox="0 0 24 16"><rect width="24" height="16" fill="#FFD700"/><rect width="24" height="8" fill="#0057B7"/></symbol>
     <symbol id="f-pl" viewBox="0 0 24 16"><rect width="24" height="16" fill="#DC143C"/><rect width="24" height="8" fill="#fff"/></symbol>
     <symbol id="f-ro" viewBox="0 0 24 16"><rect width="24" height="16" fill="#CE1126"/><rect width="16" height="16" fill="#FCD116"/><rect width="8" height="16" fill="#002B7F"/></symbol>
+    <symbol id="f-es" viewBox="0 0 24 16"><rect width="24" height="16" fill="#AA151B"/><rect y="4" width="24" height="8" fill="#F1BF00"/></symbol>
+    <symbol id="f-bg" viewBox="0 0 24 16"><rect width="24" height="16" fill="#D62612"/><rect width="24" height="10.670" fill="#00966E"/><rect width="24" height="5.330" fill="#fff"/></symbol>
+    <symbol id="f-fr" viewBox="0 0 24 16"><rect width="24" height="16" fill="#E1000F"/><rect width="16" height="16" fill="#fff"/><rect width="8" height="16" fill="#000091"/></symbol>
+    <symbol id="f-it" viewBox="0 0 24 16"><rect width="24" height="16" fill="#CE2B37"/><rect width="16" height="16" fill="#fff"/><rect width="8" height="16" fill="#009246"/></symbol>
+    <symbol id="f-sq" viewBox="0 0 24 16"><rect width="24" height="16" fill="#E41E20"/><path id="sq-h" fill="#111" d="M12 5.600l.500-1 .400-1.200.700-.700 1 .200.700.600-.900.200-.600.700-.300 1 1.100-.400 1.600-.700 1.200.100-.800.800.900.400-1 .600.700.700-1.100.300.400.800h-1.200l-1 .700-.700.900 1.200.700.600.700-1.100-.100-.700-.300-.300 1-.300 1-.500.900-.500-.900z"/><use href="#sq-h" transform="matrix(-1 0 0 1 24 0)"/></symbol>
+    <symbol id="f-el" viewBox="0 0 24 16"><rect width="24" height="16" fill="#0D5EAF"/><path d="M0 2.670h24M0 6.220h24M0 9.780h24M0 13.330h24" stroke="#fff" stroke-width="1.780"/><rect width="8.890" height="8.890" fill="#0D5EAF"/><path d="M4.445 0v8.890M0 4.445h8.890" stroke="#fff" stroke-width="1.780"/></symbol>
     <linearGradient id="lg-tile" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--sign-hi)"/><stop offset="1" style="stop-color:var(--sign-lo)"/></linearGradient>
-    <!-- Markenzeichen: Zapfpistole, deren Schlauch zum Rückpfeil wird -->
-    <symbol id="g-brand" viewBox="0 0 200 200"><g transform="translate(100 100) scale(.9) translate(-113 -125)">
-      <path d="M139 50A64 64 0 0 1 87.800 166.900" fill="none" style="stroke:var(--mark,var(--signal))" stroke-width="15" stroke-linecap="round"/>
-      <path d="M98.400 144 53.600 155.800 83 191.600z" style="fill:var(--mark,var(--signal))"/>
-      <g transform="translate(-6 -9) rotate(-24 108 92)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="82" y="60" width="66" height="36" rx="11" fill="currentColor" stroke="none"/>
-        <rect x="141" y="65" width="17" height="26" rx="6" fill="currentColor" stroke="none"/>
-        <rect x="75" y="66" width="13" height="24" rx="4" fill="currentColor" stroke="none"/>
-        <path d="M84 78H65q-9 0-13 8l-7 13" stroke-width="15.500"/>
-        <path d="M98 96v20a11 11 0 0 0 11 11h18a11 11 0 0 0 11-11V96" stroke-width="9.500"/>
-      </g>
-    </g></symbol>
+    <!-- Markenzeichen der Website (tools/marks.py) -->
+    <symbol id="g-brand" viewBox="0 0 200 200">{{MARK_GLYPH}}</symbol>
     <symbol id="m-brand" viewBox="0 0 200 200"><rect width="200" height="200" rx="46" fill="url(#lg-tile)"/><use href="#g-brand" width="200" height="200" style="color:#fff"/></symbol>
     <!-- Kraftstoffzeichen nach DIN EN 16942: Kreis = Benzin, Quadrat = Diesel -->
     <symbol id="d-p-in-d" viewBox="0 0 160 160"><rect class="d-tank" x="10" y="10" width="140" height="140" rx="12"/><text class="d-own" x="24" y="40">B7</text><g class="d-in"><circle class="d-wrong" cx="80" cy="88" r="38"/><text class="d-code" x="80" y="100">E5</text></g></symbol>
@@ -98,8 +98,9 @@
       <a href="#gebiet" data-i18n="nav.area">Einsatzgebiet</a>
       <a href="#fragen" data-i18n="nav.faq">Fragen</a>
     </nav>
+    <a class="btn btn-signal header-call" href="tel:{{WEST_TEL}}" data-open-sheet="call"><svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg><span data-i18n="cta.call">Jetzt anrufen</span></a>
     <div class="lang">
-      <button type="button" class="lang-current" aria-haspopup="true" aria-expanded="false" aria-label="Sprache wählen, choose language, dil seçin, اختر اللغة, выбрать язык"><svg class="flag" aria-hidden="true"><use data-lang-flag href="#f-de"/></svg><span class="lang-name" data-lang-current>Deutsch</span><svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></button>
+      <button type="button" class="lang-current" aria-haspopup="true" aria-expanded="false" aria-label="Sprache wählen, choose language, dil seçin, اختر اللغة, выбрать язык, elegir idioma, choisir la langue"><svg class="flag" aria-hidden="true"><use data-lang-flag href="#f-de"/></svg><span class="lang-name" data-lang-current>Deutsch</span><svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></button>
       <div class="lang-list" role="group" aria-label="Sprache, Language, Dil">
         <button type="button" data-lang="de" lang="de" aria-pressed="true"><svg class="flag" aria-hidden="true"><use href="#f-de"/></svg><span class="name">Deutsch</span></button>
         <button type="button" data-lang="en" lang="en" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-en"/></svg><span class="name">English</span></button>
@@ -109,6 +110,12 @@
         <button type="button" data-lang="uk" lang="uk" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-uk"/></svg><span class="name">Українська</span></button>
         <button type="button" data-lang="pl" lang="pl" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-pl"/></svg><span class="name">Polski</span></button>
         <button type="button" data-lang="ro" lang="ro" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-ro"/></svg><span class="name">Română</span></button>
+        <button type="button" data-lang="es" lang="es" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-es"/></svg><span class="name">Español</span></button>
+        <button type="button" data-lang="bg" lang="bg" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-bg"/></svg><span class="name">Български</span></button>
+        <button type="button" data-lang="fr" lang="fr" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-fr"/></svg><span class="name">Français</span></button>
+        <button type="button" data-lang="it" lang="it" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-it"/></svg><span class="name">Italiano</span></button>
+        <button type="button" data-lang="sq" lang="sq" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-sq"/></svg><span class="name">Shqip</span></button>
+        <button type="button" data-lang="el" lang="el" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-el"/></svg><span class="name">Ελληνικά</span></button>
       </div>
     </div>
   </div>
@@ -118,11 +125,8 @@
 
   <section class="hero wrap" aria-labelledby="hero-h">
     <div class="sign">
-      <div class="sign-top">
-        <span class="plate" aria-hidden="true"><svg><use href="#g-brand"/></svg></span>
-        <p class="avail"><span class="avail-dot" aria-hidden="true"></span><span data-i18n="hero.avail">Rund um die Uhr erreichbar, auch sonn- und feiertags</span></p>
-      </div>
       <div class="sign-copy">
+        <p class="avail"><span class="avail-dot" aria-hidden="true"></span><span data-i18n="hero.avail">Rund um die Uhr erreichbar, auch sonn- und feiertags</span></p>
         <h1 id="hero-h" data-i18n="hero.h1">Falsch getankt?<br>Motor aus lassen.</h1>
         <p class="lead" data-i18n="hero.lead">Wir kommen zu Ihnen, pumpen den falschen Kraftstoff ab und spülen Tank und Leitungen.<span class="lead-more"> In den meisten Fällen fahren Sie danach einfach weiter.</span></p>
       </div>
@@ -158,6 +162,12 @@
         <p class="callpanel-note" data-i18n="hero.note">Den Festpreis nennen wir Ihnen am Telefon. Sie stehen in einem anderen Bundesland? Rufen Sie trotzdem an.</p>
       </div>
     </div>
+    <ul class="facts">
+      <li><a class="fact" href="#bewertungen"><svg class="ico fact-ico fact-star" aria-hidden="true"><use href="#i-star"/></svg><span class="fact-t" data-i18n="facts.rating.t">5,0 bei Google</span><span class="fact-s" data-i18n="facts.rating.s">{{REVIEWS_TOTAL}} Bewertungen</span></a></li>
+      <li><div class="fact"><svg class="ico fact-ico" aria-hidden="true"><use href="#i-clock"/></svg><span class="fact-t" data-i18n="facts.hours.t">Rund um die Uhr</span><span class="fact-s" data-i18n="facts.hours.s">auch sonn- und feiertags</span></div></li>
+      <li><div class="fact"><svg class="ico fact-ico" aria-hidden="true"><use href="#i-tag"/></svg><span class="fact-t" data-i18n="facts.price.t">Festpreis vorab</span><span class="fact-s" data-i18n="facts.price.s">ohne Anfahrtspauschale</span></div></li>
+      <li><div class="fact"><svg class="ico fact-ico" aria-hidden="true"><use href="#i-pin"/></svg><span class="fact-t" data-i18n="facts.site.t">Direkt vor Ort</span><span class="fact-s" data-i18n="facts.site.s">Abschleppen meist nicht nötig</span></div></li>
+    </ul>
   </section>
 
   <section class="section wrap check" id="check" aria-labelledby="check-h">
@@ -330,9 +340,18 @@
     <div class="section-head">
       <h2 id="area-h" data-i18n="area.h">Hier sind wir im Einsatz</h2>
     </div>
+    <div class="area-layout">
+    <div class="map">
+      {{MAP_SVG}}
+      <ul class="map-legend">
+        <li><span class="zone zone-west" aria-hidden="true"></span><span data-i18n="region.west">NRW, Hessen, Rheinland-Pfalz</span></li>
+        <li><span class="zone zone-by" aria-hidden="true"></span><span data-i18n="region.by">Bayern</span></li>
+        <li><span class="zone zone-rm" aria-hidden="true"></span><span data-i18n="region.rm">Frankfurt und Rhein-Main</span></li>
+      </ul>
+    </div>
     <div class="areas">
       <div class="area">
-        <h3 data-i18n="area.west.h">Nordrhein-Westfalen, Hessen und Rheinland-Pfalz</h3>
+        <h3><span class="zone zone-west" aria-hidden="true"></span><span data-i18n="area.west.h">Nordrhein-Westfalen, Hessen und Rheinland-Pfalz</span></h3>
         <p data-i18n="area.west.p">Köln, Düsseldorf, Dortmund, Essen, Duisburg, Bochum, Wuppertal, Bonn, Gelsenkirchen, Mönchengladbach, Aachen, Krefeld, Leverkusen, Solingen und die Orte dazwischen.</p>
         <a class="btn-call btn-call-s" href="tel:{{WEST_TEL}}" data-region="west">
           <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
@@ -340,7 +359,7 @@
         </a>
       </div>
       <div class="area">
-        <h3 data-i18n="area.by.h">Bayern</h3>
+        <h3><span class="zone zone-by" aria-hidden="true"></span><span data-i18n="area.by.h">Bayern</span></h3>
         <p data-i18n="area.by.p">München, Nürnberg, Augsburg, Regensburg, Ingolstadt, Würzburg, Fürth, Erlangen, Bamberg, Bayreuth, Landshut, Rosenheim, Kempten, Passau. Auch entlang der A3, A8, A9, A93 und A99. Hier fährt unser fester Servicepartner.</p>
         <a class="btn-call btn-call-s" href="tel:{{BY_TEL}}" data-region="by">
           <span class="call-ico" aria-hidden="true"><svg class="ico"><use href="#i-phone"/></svg></span>
@@ -348,7 +367,7 @@
         </a>
       </div>
       <div class="area area-new" id="rhein-main">
-        <h3><span data-i18n="area.rm.h">Rhein-Main</span> <span class="soon-tag" data-i18n="soon.tag">Neu</span></h3>
+        <h3><span class="zone zone-rm" aria-hidden="true"></span><span data-i18n="area.rm.h">Rhein-Main</span> <span class="soon-tag" data-i18n="soon.tag">Neu</span></h3>
         <p data-i18n="area.rm.p">Frankfurt am Main, Offenbach, Darmstadt, Wiesbaden, Mainz, Hanau, Bad Homburg, Rüsselsheim, Friedberg, Gießen, Wetzlar, Limburg, Bensheim und Worms. Dazu der weitere Umkreis bis etwa 100 Kilometer, zum Beispiel Mannheim, Ludwigshafen, Heidelberg, Marburg, Fulda und Koblenz.</p>
         <p class="area-new-lead" data-i18n="area.rm.soon">Eigenes Team mit eigener Nummer, rund um die Uhr.</p>
         <a class="btn-call btn-call-s" href="tel:{{RM_TEL}}" data-region="rm">
@@ -356,6 +375,7 @@
           <span class="btn-call-text"><span class="call-label" data-i18n="cta.call">Jetzt anrufen</span><span class="num">{{RM_NUM}}</span></span>
         </a>
       </div>
+    </div>
     </div>
     <p class="area-other" data-i18n="area.other">Sie stehen in einem anderen Bundesland? Rufen Sie an. Wir sagen Ihnen sofort, ob wir zu Ihnen kommen können.</p>
   </section>
@@ -508,10 +528,15 @@
 
 <footer class="site-footer">
   <div class="wrap footer-grid">
-    <div>
-      <p class="brand brand-footer"><svg class="brand-mark" aria-hidden="true"><use href="#m-brand"/></svg><span class="brand-name">{{BRAND_HTML}}<span class="brand-tld">{{TLD}}</span></span></p>
+    <div class="footer-brand">
+      <p class="brand brand-footer"><svg class="brand-mark" aria-hidden="true"><use href="#g-brand"/></svg><span class="brand-name">{{BRAND_HTML}}<span class="brand-tld">{{TLD}}</span></span></p>
       <p class="footer-co" data-i18n="footer.co">Ein Service von {{COMPANY_SHORT}}, {{STREET}}, {{CITY}}.</p>
     </div>
+    <ul class="footer-lines">
+      <li><span data-i18n="region.west">NRW, Hessen, Rheinland-Pfalz</span><a class="num" href="tel:{{WEST_TEL}}" data-region="west">{{WEST_NUM}}</a></li>
+      <li><span data-i18n="region.by">Bayern</span><a class="num" href="tel:{{BY_TEL}}" data-region="by">{{BY_NUM}}</a></li>
+      <li><span data-i18n="region.rm">Frankfurt und Rhein-Main</span><a class="num" href="tel:{{RM_TEL}}" data-region="rm">{{RM_NUM}}</a></li>
+    </ul>
     <nav class="footer-nav" aria-label="Rechtliches">
       <a href="#impressum">Impressum</a>
       <a href="#datenschutz" data-i18n="footer.privacy">Datenschutz</a>
@@ -525,6 +550,12 @@
       <button type="button" data-lang="uk" lang="uk" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-uk"/></svg><span>Українська</span></button>
       <button type="button" data-lang="pl" lang="pl" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-pl"/></svg><span>Polski</span></button>
       <button type="button" data-lang="ro" lang="ro" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-ro"/></svg><span>Română</span></button>
+      <button type="button" data-lang="es" lang="es" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-es"/></svg><span>Español</span></button>
+      <button type="button" data-lang="bg" lang="bg" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-bg"/></svg><span>Български</span></button>
+      <button type="button" data-lang="fr" lang="fr" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-fr"/></svg><span>Français</span></button>
+      <button type="button" data-lang="it" lang="it" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-it"/></svg><span>Italiano</span></button>
+      <button type="button" data-lang="sq" lang="sq" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-sq"/></svg><span>Shqip</span></button>
+      <button type="button" data-lang="el" lang="el" aria-pressed="false"><svg class="flag" aria-hidden="true"><use href="#f-el"/></svg><span>Ελληνικά</span></button>
     </div>
     <p class="footer-fine"><span data-i18n="footer.alias">Auch erreichbar unter {{ALIAS}}.</span> <span data-i18n="footer.fine">Diese Website kommt ohne Cookies und ohne Tracking aus.</span></p>
   </div>

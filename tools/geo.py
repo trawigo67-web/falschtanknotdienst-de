@@ -43,7 +43,8 @@ def dp(pts, tol):
             stack.append((a, bi)); stack.append((bi, b))
     return [p for p, k in zip(pts, keep) if k]
 
-def main():
+def load_states():
+    """Liest die Länder ein: Kürzel -> Liste von Ringen (Punkte als (Länge, Breite))."""
     data = json.loads(SRC.read_text(encoding="utf-8"))
     states = {}
     for f in data["features"]:
@@ -58,6 +59,11 @@ def main():
                     pts = pts[:-1]
                 rings.append(pts)
         states[code] = rings
+    return states
+
+
+def simplify_states(states, tol_for):
+    """Vereinfacht alle Ringe. tol_for(Menge der Länder an einem Bogen) -> Toleranz in Kilometern."""
     # Welche Länder teilen sich einen Punkt?
     owners = {}
     for code, rings in states.items():
@@ -65,9 +71,6 @@ def main():
             for p in r:
                 owners.setdefault(p, set()).add(code)
     sig = {p: frozenset(s) for p, s in owners.items()}
-
-    def tol_for(s):
-        return TOL_FINE if (s & SERVICE) else TOL_COARSE
 
     def simplify_arc(arc, closed):
         s = sig[arc[1]] if len(arc) > 2 else sig[arc[0]]
@@ -109,6 +112,12 @@ def main():
             if len(simp) >= 3:
                 new_rings.append(simp)
         out[code] = new_rings
+    return out
+
+
+def main():
+    states = load_states()
+    out = simplify_states(states, lambda s: TOL_FINE if (s & SERVICE) else TOL_COARSE)
 
     def enc_num(v):
         v = ~(v << 1) if v < 0 else (v << 1)

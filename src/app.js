@@ -15,12 +15,12 @@
   function isWide() { return !!(window.matchMedia && window.matchMedia('(min-width: 760px)').matches); }
 
   /* ---------- Sprache ---------- */
-  var LANGS = ['de', 'en', 'tr', 'ar', 'ru', 'uk', 'pl', 'ro'];
+  var LANGS = ['de', 'en', 'tr', 'ar', 'ru', 'uk', 'pl', 'ro', 'es', 'bg', 'fr', 'it', 'sq', 'el'];
   var RTL = { ar: true };
-  var LANG_DE = { en: 'Englisch', tr: 'Türkisch', ar: 'Arabisch', ru: 'Russisch', uk: 'Ukrainisch', pl: 'Polnisch', ro: 'Rumänisch' };
+  var LANG_DE = { en: 'Englisch', tr: 'Türkisch', ar: 'Arabisch', ru: 'Russisch', uk: 'Ukrainisch', pl: 'Polnisch', ro: 'Rumänisch', es: 'Spanisch', bg: 'Bulgarisch', fr: 'Französisch', it: 'Italienisch', sq: 'Albanisch', el: 'Griechisch' };
   var packWait = {};
   var lang = 'de';
-  /* Deutsch, Englisch und Türkisch stehen in der Seite; die übrigen Sprachen werden bei Bedarf nachgeladen */
+  /* Deutsch, Englisch und Türkisch stehen in der Seite; die übrigen elf Sprachen werden bei Bedarf nachgeladen */
   function loadPack(l, cb) {
     if (l === 'de' || I18N[l]) { cb(true); return; }
     if (packWait[l]) { packWait[l].push(cb); return; }
@@ -151,9 +151,14 @@
   if (!GEO_OK) { root.classList.add('no-geo'); }
   /* Farbe der Browserleiste folgt dem gewählten Farbthema */
   (function () {
-    var tc = doc.querySelector('meta[name="theme-color"][media*="light"]');
-    var light = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-    if (tc && light) { var p = getComputedStyle(root).getPropertyValue('--paper').trim(); if (p) { tc.setAttribute('content', p); } }
+    var cs = getComputedStyle(root);
+    function v(name) { return cs.getPropertyValue(name).trim(); }
+    var dark = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var tc = doc.querySelector('meta[name="theme-color"][media*="' + (dark ? 'dark' : 'light') + '"]');
+    var paper = v('--paper');
+    /* im Dunkelmodus kann der Wert eine Mischfarbe sein: dann die fertig berechnete Hintergrundfarbe nehmen */
+    if (paper.indexOf('color-mix') === 0) { paper = getComputedStyle(doc.body).backgroundColor; }
+    if (tc && paper) { tc.setAttribute('content', paper); }
   })();
   function setRegion(r) { if (r === 'west' || r === 'by' || r === 'rm') { region = r; } }
   function soonAt(lat, lon) {
@@ -304,6 +309,15 @@
   } else {
     heroSeen = false; updateBar();
   }
+
+  /* ---------- Kopfzeile bekommt eine Linie, sobald gescrollt wurde ---------- */
+  var scrolled = false;
+  function onScroll() {
+    var now = (window.pageYOffset || root.scrollTop || 0) > 8;
+    if (now !== scrolled) { scrolled = now; root.classList.toggle('is-scrolled', now); }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
   /* ---------- Impressum und Datenschutz als eigene Ansicht ---------- */
   function route() {
@@ -717,6 +731,15 @@
     u.thanks = /danke|vielen dank|\bthx\b|thank|tesekkur|sag ?ol/.test(f);
     return u;
   }
+  /* Ja und Nein je Sprache: [ja, nein]. Deutsch, Englisch und Türkisch verstehen sich gegenseitig wie bisher. */
+  var E = '(?:\\s|$)';
+  var DET = [/^(?:ja|jo|yes|yep|evet)\b/, /^(?:nein|ne|noe|no|nope|hayir|yok)\b/];
+  var YESNO = {
+    de: DET, en: DET, tr: DET,
+    es: [/^si\b/, /^no\b/], it: [/^si\b/, /^no\b/], fr: [/^oui\b/, /^non\b/], sq: [/^po\b/, /^jo\b/], pl: [/^tak\b/, /^nie\b/], ro: [/^da\b/, /^nu\b/],
+    ru: [new RegExp('^да' + E), new RegExp('^нет' + E)], uk: [new RegExp('^так' + E), new RegExp('^н[іи]' + E)], bg: [new RegExp('^да' + E), new RegExp('^не' + E)],
+    el: [new RegExp('^ναι' + E), new RegExp('^οχι' + E)], ar: [new RegExp('^(?:نعم|ايوه|أيوه)' + E), new RegExp('^لا' + E)]
+  };
   function matchChip(text) {
     var n = fold(text).replace(/[.!?,;:]/g, '').trim();
     if (!currentChips.length || n.length < 2) { return null; }
@@ -724,8 +747,9 @@
       if (fold(currentChips[i].label).replace(/[.!?,;:]/g, '').trim() === n) { return currentChips[i]; }
     }
     if (S.asked === 'engine' && currentChips.length === 3) {
-      if (/^(?:nein|ne|noe|no|nope|hayir|yok)\b/.test(n)) { return currentChips[0]; }
-      if (/^(?:ja|jo|yes|yep|evet)\b/.test(n)) { return currentChips[2]; }
+      var yn = YESNO[lang] || YESNO.de;
+      if (yn[1].test(n) || (lang !== 'de' && YESNO.en[1].test(n))) { return currentChips[0]; }
+      if (yn[0].test(n) || (lang !== 'de' && YESNO.en[0].test(n))) { return currentChips[2]; }
     }
     return null;
   }

@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="../brand/{{THEME}}/icon.svg">
 <title>Admin: Farbthema | {{DISPLAY}}</title>
 <style>
 :root{--bg:#F3F4F6;--card:#fff;--ink:#14181C;--muted:#5B6570;--line:#DDE1E6;--accent:#14181C;--ok:#1A7446;--err:#B8251A;
@@ -132,7 +133,8 @@ button.link{background:none;border:0;padding:0;color:var(--muted);text-decoratio
     var msgText = 'Farbthema: ' + THEMES[theme].name + ' (Admin-Bereich)';
     return api(token, repo, 'index.html').then(function (f) {
       var html = fromB64(f.content);
-      var next = html.replace(/(<html[^>]*data-theme=")[a-z]+(")/, '$1' + theme + '$2');
+      /* Farbthema umstellen, dazu die Verweise auf App-Symbol, Teilen-Bild und Manifest (liegen je Thema unter brand/<thema>/) */
+      var next = html.replace(/(<html[^>]*data-theme=")[a-z]+(")/, '$1' + theme + '$2').replace(/(\bbrand\/)[a-z]+(\/)/g, '$1' + theme + '$2');
       if (next === html && html.indexOf('data-theme="' + theme + '"') < 0) { throw new Error('marker'); }
       if (next === html) { return; }
       return api(token, repo, 'index.html', { method: 'PUT', body: { message: msgText, content: toB64(next), sha: f.sha } });

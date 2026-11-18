@@ -1,0 +1,6 @@
+dist/
+out/
+fonts-src/
+logo/_tmp/
+__pycache__/
+assets/geo/de-states-simplified.json

@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Baut die Website aus src/.
-   build.py preview                 -> dist/ (Vorschau, noindex)
-   build.py site <site.json> <out>  -> fertige Website für eine Domain"""
+   build.py preview [site.json]     -> dist/ (Vorschau mit Testschnittstelle, noindex)
+   build.py site <site.json> <out>  -> fertige Website für eine Domain
+   Logo, App-Symbole und Teilen-Bild kommen aus assets/brand/ (erzeugt von tools/brand.py), die Karte aus src/map.svg (tools/karte.py)."""
 import json, re, sys, html as htmlmod, urllib.parse, pathlib, shutil, hashlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import marks
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DARK = ("--brand-ab:#FF8A1F;--paper:#051A1E;--surface:#0A2A31;--tint:#0F363E;--ink:#EAF3F1;--muted:#9FB9BC;--line:#1A424A;--line-strong:#356B75;"
@@ -10,12 +13,6 @@ DARK = ("--brand-ab:#FF8A1F;--paper:#051A1E;--surface:#0A2A31;--tint:#0F363E;--i
         "--danger:#FF9B8C;--danger-bg:#3B1713;--ok:#7BDCA8;--ok-bg:#0E3525;"
         "--shadow:0 18px 50px rgba(0,0,0,.55);--shadow-card:0 1px 2px rgba(0,0,0,.35),0 16px 36px -22px rgba(0,0,0,.8);"
         "--shadow-sign:0 2px 4px rgba(0,0,0,.3),0 30px 60px -30px rgba(0,0,0,.85);color-scheme:dark")
-FAVICON = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' rx='46' fill='#0B4650'/>"
-    "<g transform='translate(100 100) scale(.9) translate(-113 -125)'><path d='M139 50A64 64 0 0 1 87.8 166.9' fill='none' stroke='#FF8A1F' stroke-width='17' stroke-linecap='round'/>"
-    "<path d='M98.4 144 53.6 155.8 83 191.6z' fill='#FF8A1F'/><g transform='translate(-6 -9) rotate(-24 108 92)' fill='none' stroke='#fff' stroke-linecap='round' stroke-linejoin='round'>"
-    "<rect x='82' y='60' width='66' height='36' rx='11' fill='#fff' stroke='none'/><rect x='141' y='65' width='17' height='26' rx='6' fill='#fff' stroke='none'/>"
-    "<path d='M84 78H65q-9 0-13 8l-7 13' stroke-width='17'/><path d='M98 96v20a11 11 0 0 0 11 11h18a11 11 0 0 0 11-11V96' stroke-width='10'/></g></g></svg>")
-
 def strip(s):
     return re.sub(r"\s+", " ", htmlmod.unescape(re.sub(r"<[^>]+>", "", s))).strip()
 
@@ -23,15 +20,21 @@ ALWAYS = ("sign", "sign-hi", "sign-lo", "sign-muted", "board", "foot-a", "foot-b
 LIGHT = ("brand-ab", "link", "tint", "paper", "line", "line-strong", "muted", "ink")
 
 def theme_css(themes):
-    """Farbthemen: <html data-theme="..."> wählt eines. Petrol ist der Grundzustand in :root."""
+    """Farbthemen: <html data-theme="..."> wählt eines. Petrol ist der Grundzustand in :root.
+       Die Auswahl ist bewusst stärker als die Regel für den Dunkelmodus, damit Schild, Logo und Anruf-Knöpfe auch dort dem Thema folgen."""
     out = []
     for key, t in themes.items():
         if key == "petrol":
             continue
-        sel = 'html[data-theme="%s"]' % key
+        sel = 'html:root[data-theme="%s"]' % key
         out.append(sel + "{" + "".join("--%s:%s;" % (v, t[v]) for v in ALWAYS) + ("--mark:%s;" % t["mark"] if "mark" in t else "") + "}")
         out.append("@media (prefers-color-scheme:light){" + sel + "{" + "".join("--%s:%s;" % (v, t[v]) for v in LIGHT) + "}}")
         out.append("@media (prefers-color-scheme:dark){" + sel + "{--brand-ab:%s;--link:%s}}" % (t["brand-ab-dark"], t["signal-hi"]))
+    # Dunkelmodus der Themen: fast schwarze Flächen mit einem Hauch der Themenfarbe (Petrol behält seine eigenen Werte)
+    out.append('@supports (color:color-mix(in srgb,red,blue)){@media (prefers-color-scheme:dark){html:root[data-theme]:not([data-theme="petrol"]){'
+               "--paper:color-mix(in srgb,var(--foot-b) 38%,#0A0C0E);--surface:color-mix(in srgb,var(--foot-a) 34%,#14171A);"
+               "--tint:color-mix(in srgb,var(--foot-a) 40%,#1D2125);--line:color-mix(in srgb,var(--foot-a) 40%,#2A2F34);"
+               "--line-strong:color-mix(in srgb,var(--sign-hi) 40%,#59616A);--muted:color-mix(in srgb,var(--sign-muted) 60%,#8E979F);--ink:#EDF1F4}}}")
     return "\n".join(out)
 
 def build(cfg, mode, out):
@@ -51,14 +54,16 @@ def build(cfg, mode, out):
     app = app.replace("/*CFG*/", json.dumps(jscfg, ensure_ascii=False))
     if mode == "site":
         app = re.sub(r"\n\s*window\.__tank = .*?;\n", "\n", app)
-    page = page.replace("/*CSS*/", css).replace("/*JS*/", strings + "\n" + geo + "\n" + app)
-
     theme = cfg.get("theme", "petrol")
     tfile = out / "theme.txt"
     if tfile.exists():
         theme = tfile.read_text(encoding="utf-8").strip() or theme  # im Admin-Bereich gewählt, bleibt beim Neubau erhalten
     if theme not in themes:
         theme = "petrol"
+    th = themes[theme]
+    mark = cfg.get("mark", "zapf")
+    page = page.replace("/*CSS*/", css).replace("/*JS*/", strings + "\n" + geo + "\n" + app)
+    page = page.replace("{{MARK_GLYPH}}", marks.glyph_css(mark)).replace("{{MAP_SVG}}", (ROOT / "src/map.svg").read_text(encoding="utf-8").strip())
     url = "https://" + cfg["domain"] + "/"
     canon = cfg.get("canonical", url)
     display = cfg.get("display", cfg["brand"] + cfg["tld"])
@@ -67,11 +72,15 @@ def build(cfg, mode, out):
         "ROBOTS": "index, follow" if mode == "site" else "noindex, nofollow",
         "CANONICAL": '<link rel="canonical" href="%s">' % canon if mode == "site" else "",
         "OGURL": '<meta property="og:url" content="%s">' % url if mode == "site" else "",
-        "OGIMAGE": ('<meta property="og:image" content="%sog.png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta name="twitter:card" content="summary_large_image">' % url) if mode == "site" else "",
+        "OGIMAGE": ('<meta property="og:image" content="%sbrand/%s/og.png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta name="twitter:card" content="summary_large_image">' % (url, theme)) if mode == "site" else "",
         "THEME": theme,
         "BRAND": cfg["brand"], "TLD": cfg["tld"], "BRAND_HTML": cfg["brandHtml"], "DISPLAY": display,
         "ALIAS": cfg.get("alias", ""),
-        "FAVICON": "data:image/svg+xml," + urllib.parse.quote(FAVICON, safe="/:=' ,()-."),
+        "TC_LIGHT": th["paper"],
+        "C_SIGN": th["sign"], "C_SIGN_HI": th["sign-hi"], "C_SIGN_LO": th["sign-lo"], "C_SIGN_MUTED": th["sign-muted"],
+        "C_SIGNAL": th["signal"], "C_ON_SIGNAL": th["on-signal"],
+        "MARK_PLATE": marks.glyph(mark, th["sign"], th["sign"] if mark == "puls" else th.get("mark", th["signal"])),
+        "REVIEWS_TOTAL": str(sum(cfg.get("reviewCounts", {}).values())),
         "WEST_TEL": cfg["regions"]["west"]["tel"], "WEST_NUM": cfg["regions"]["west"]["num"], "WEST_WA": cfg["regions"]["west"]["wa"],
         "RM_TEL": cfg["regions"]["rm"]["tel"], "RM_NUM": cfg["regions"]["rm"]["num"], "RM_WA": cfg["regions"]["rm"]["wa"],
         "BY_TEL": cfg["regions"]["by"]["tel"], "BY_NUM": cfg["regions"]["by"]["num"], "BY_WA": cfg["regions"]["by"]["wa"],
@@ -90,6 +99,7 @@ def build(cfg, mode, out):
         "@context": "https://schema.org", "@type": ["AutomotiveBusiness", "EmergencyService"],
         "name": display, "description": "Mobiler Abpumpservice bei Falschbetankung: Benzin im Diesel, Diesel im Benziner, AdBlue.",
         "url": url, "telephone": cfg["regions"]["west"]["tel"], "priceRange": "ab %s €" % cfg["price"]["car"],
+        "logo": url + "brand/%s/icon-512.png" % theme, "image": url + "brand/%s/og.png" % theme,
         "address": {"@type": "PostalAddress", "streetAddress": cfg["street"], "postalCode": cfg["city"].split(" ")[0],
                     "addressLocality": cfg["city"].split(" ", 1)[1], "addressCountry": "DE"},
         "areaServed": ["Nordrhein-Westfalen", "Hessen", "Rheinland-Pfalz", "Bayern"],
@@ -132,15 +142,29 @@ def build(cfg, mode, out):
             sys.exit("Chat-Schlüssel weichen ab (%s): %s" % (lang, d))
 
     out.mkdir(parents=True, exist_ok=True)
-    for sub in ("fonts", "icons"):
-        (out / sub).mkdir(exist_ok=True)
-        for f in (ROOT / "assets" / sub).iterdir():
-            shutil.copy2(f, out / sub / f.name)
-    manifest = {"name": display + " – Soforthilfe bei Falschbetankung", "short_name": cfg.get("short", display)[:12], "lang": "de",
-                "start_url": "./", "display": "standalone", "background_color": "#EEF3F2", "theme_color": "#0B4650",
-                "icons": [{"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-                          {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]}
-    (out / "site.webmanifest").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
+    (out / "fonts").mkdir(exist_ok=True)
+    for f in (ROOT / "assets/fonts").iterdir():
+        shutil.copy2(f, out / "fonts" / f.name)
+    brand_dir = ROOT / "assets/brand" / cfg["brand"]
+    if not brand_dir.exists():      # Vorschau ohne eigene Website: Material der ersten Website
+        brand_dir = sorted(p for p in (ROOT / "assets/brand").iterdir() if p.is_dir())[0]
+    # App-Symbole, Teilen-Bild und Manifest für jedes Farbthema: Der Admin-Bereich stellt beim Themenwechsel nur die Verweise um.
+    for old_path in ("icons", "site.webmanifest"):
+        target = out / old_path
+        if target.is_dir():
+            shutil.rmtree(target)
+        elif target.exists():
+            target.unlink()
+    for key, t in themes.items():
+        d = out / "brand" / key; d.mkdir(parents=True, exist_ok=True)
+        for f in (brand_dir / key).iterdir():
+            shutil.copy2(f, d / f.name)
+        manifest = {"name": display + " – Soforthilfe bei Falschbetankung", "short_name": cfg.get("short", display)[:12], "lang": "de",
+                    "start_url": "../../", "scope": "../../", "display": "standalone", "background_color": t["paper"], "theme_color": t["sign"],
+                    "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+                              {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]}
+        (d / "site.webmanifest").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
+    shutil.copy2(brand_dir / theme / "og.png", out / "og.png")   # alte Adresse des Teilen-Bilds bleibt erreichbar
     (out / "index.html").write_text(page, encoding="utf-8")
     # Admin-Bereich: Farbthema wählen (nicht für Suchmaschinen)
     adm = (ROOT / "src/admin.html").read_text(encoding="utf-8")
@@ -148,7 +172,7 @@ def build(cfg, mode, out):
     own = "trawigo67-web/" + cfg["domain"].replace(".", "-")
     adm = (adm.replace("{{THEMES_JSON}}", json.dumps(themes, ensure_ascii=False))
               .replace("{{REPOS_JSON}}", json.dumps(repos)).replace("{{OWN_REPO}}", json.dumps(own if own in repos else (repos[0] if repos else own)))
-              .replace("{{DISPLAY}}", htmlmod.escape(display)))
+              .replace("{{DISPLAY}}", htmlmod.escape(display)).replace("{{THEME}}", theme))
     (out / "admin").mkdir(exist_ok=True)
     (out / "admin" / "index.html").write_text(adm, encoding="utf-8")
     # Sprachpakete, die erst bei Bedarf geladen werden
@@ -182,4 +206,6 @@ if __name__ == "__main__":
         base.update(json.loads(pathlib.Path(sys.argv[2]).read_text(encoding="utf-8")))
         build(base, "site", pathlib.Path(sys.argv[3]))
     else:
+        if len(sys.argv) > 2:
+            base.update(json.loads(pathlib.Path(sys.argv[2]).read_text(encoding="utf-8")))
         build(base, "preview", ROOT / "dist")

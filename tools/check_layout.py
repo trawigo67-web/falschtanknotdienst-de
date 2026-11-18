@@ -8,7 +8,7 @@ FIXES = [("BY", 48.137, 11.575), ("HE+bald", 50.111, 8.682), ("NW", 50.938, 6.96
 JS = """() => { const vw = document.documentElement.clientWidth; const bad = [];
   for (const p of document.querySelectorAll('.case-panel')) p.hidden = false;
   document.querySelectorAll('main *, header *, footer *').forEach(e => { if (e.closest('.lang-list')) return; const r = e.getBoundingClientRect(); if (r.width && (r.right > vw + 0.5 || r.left < -0.5)) bad.push(e.tagName + '.' + String(e.className.baseVal ?? e.className).slice(0, 30) + ' ' + Math.round(r.left) + '-' + Math.round(r.right)); });
-  document.querySelectorAll('.btn-call, .loc-btn, .btn, .case-tab, .sheet-row, .soon-tag, .callpanel-soon').forEach(b => { const br = b.getBoundingClientRect(); if (!br.width) return;
+  document.querySelectorAll('.btn-call, .loc-btn, .btn, .case-tab, .sheet-row, .soon-tag, .callpanel-soon, .fact, .footer-langs button, .map-legend li').forEach(b => { const br = b.getBoundingClientRect(); if (!br.width) return;
     b.querySelectorAll('*').forEach(c => { const r = c.getBoundingClientRect(); if (r.width && (r.right > br.right + 0.5 || r.left < br.left - 0.5 || r.bottom > br.bottom + 0.5 || r.top < br.top - 0.5)) bad.push('ragt heraus: ' + String(b.className).slice(0, 24) + ' > ' + String(c.className.baseVal ?? c.className).slice(0, 20)); }); });
   const hr = document.querySelector('.header-row').getBoundingClientRect(); const br = document.querySelector('.brand').getBoundingClientRect(); const lg = document.querySelector('.lang').getBoundingClientRect();
   const small = [...document.querySelectorAll('main a, main button, .stickybar a, .stickybar button, header button, header a')].filter(e => { const r = e.getBoundingClientRect(); return r.width && r.height && (r.height < 43.5) && !e.closest('.legal') && !e.classList.contains('textlink') && !e.closest('p') ; }).map(e => String(e.className).slice(0, 24) + ' ' + Math.round(e.getBoundingClientRect().height));
@@ -36,14 +36,15 @@ async def main():
             ok += good; bad += (not good)
             if not good: print("!!", label, w, lang, r, errs[:2])
             await ctx.close()
-        LANGS = ["de", "en", "tr", "ar", "ru", "uk", "pl", "ro"]
+        LANGS = ["de", "en", "tr", "ar", "ru", "uk", "pl", "ro", "es", "bg", "fr", "it", "sq", "el"]
         for i, site in enumerate(SITES):
             for w in (WIDTHS if i == 0 else [320, 360, 390, 768, 1280]):
                 for lang in LANGS:
                     await run("http://localhost:8766/%s/index.html" % site, w, lang, None, site)
+        print("Seiten geprüft:", ok + bad, flush=True)
         for w in [320, 360, 390, 768, 1280]:
             for lang in LANGS:
-                for fx in (FIXES if lang in ("de", "ar", "ru") else [FIXES[0], FIXES[1], FIXES[4]]):
+                for fx in (FIXES if lang in ("de", "ar", "ru", "el") else [FIXES[0], FIXES[1], FIXES[4]]):
                     await run("http://localhost:8765/", w, lang, fx, "Standort " + fx[0])
         await b.close()
     print("Layout-Prüfung:", ok, "ok,", bad, "fehlerhaft")

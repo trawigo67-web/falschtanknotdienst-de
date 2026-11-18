@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Kyrillische Schnitte von Sofia Sans: internationale Buchstabenformen als Standard.
+"""Kyrillische und griechische Schnitte von Sofia Sans.
+   Kyrillisch: internationale Buchstabenformen als Standard.
    Die Schrift zeigt Kyrillisch von Haus aus in bulgarischen Formen und schaltet nur für Russisch (RUS, Merkmal locl) um.
    Ukrainisch bekäme sonst bulgarische Formen. Hier wird das locl-Merkmal zum Standard der kyrillischen Schrift.
    Quelle: @fontsource-variable (SIL Open Font License 1.1). Aufruf: python3 tools/fontfix.py"""
@@ -19,6 +20,14 @@ for src, dst in JOBS:
         d = sr.Script.DefaultLangSys
         d.FeatureIndex = sorted(set(d.FeatureIndex) | set(rus.FeatureIndex))
         d.FeatureCount = len(d.FeatureIndex)
+    f.flavor = "woff2"
+    f.save(ROOT / "assets/fonts" / dst)
+    print(dst, (ROOT / "assets/fonts" / dst).stat().st_size, "Bytes")
+# Griechisch: nur die Schriftstärken, die die Seite benutzt (hält die Dateien klein)
+from fontTools.varLib import instancer
+for src, dst, rng in [("sofia-sans/files/sofia-sans-greek-wght-normal.woff2", "ss-greek.woff2", (400, 700)),
+                      ("sofia-sans-condensed/files/sofia-sans-condensed-greek-wght-normal.woff2", "ssc-greek.woff2", (600, 900))]:
+    f = instancer.instantiateVariableFont(TTFont(SRC / src), {"wght": rng})
     f.flavor = "woff2"
     f.save(ROOT / "assets/fonts" / dst)
     print(dst, (ROOT / "assets/fonts" / dst).stat().st_size, "Bytes")

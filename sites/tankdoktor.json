@@ -1,12 +1,18 @@
 {
   "domain": "tankdoktor.de",
   "brand": "tankdoktor",
-  "brandHtml": "tank<b>doktor</b>",
+  "brandHtml": "Tankdoktor",
   "tld": ".de",
   "display": "Tankdoktor",
   "short": "Tankdoktor",
   "title": "Tankdoktor: falsch getankt? Wir pumpen vor Ort ab, rund um die Uhr",
   "alias": "falschtanknotdienst.de",
   "canonical": "https://falschtanknotdienst.de/",
-  "brandVw": "7.2vw"
+  "brandVw": "7.2vw",
+  "mark": "puls",
+  "logoTheme": "pink",
+  "logoTld": false,
+  "claim": "Soforthilfe bei Falschbetankung",
+  "markNote": "Der Tropfen steht für den Kraftstoff, die Pulslinie für den Doktor: Wir bringen den Tank wieder in Ordnung. Ein einziges, kräftiges Zeichen, das auch im Browser-Tab und auf dem Handy erkennbar bleibt.",
+  "logoDarkFree": true
 }
