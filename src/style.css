@@ -578,3 +578,16 @@ svg{direction:ltr}
   .faq summary:hover .ico{background:var(--line)}
   .chip:hover{background:var(--tint)}
 }
+
+/* Erklärvideo: lädt erst nach dem Antippen, hochkant auf dem Handy, quer ab Tablet-Breite */
+.vid-box{position:relative;width:100%;max-width:340px;aspect-ratio:9/16;margin-inline:auto;border-radius:var(--r-sign);overflow:hidden;background:#17181A;box-shadow:var(--shadow-sign)}
+.vid-play{position:absolute;inset:0;display:block;width:100%;height:100%;padding:0;border:0;background:none;cursor:pointer;color:inherit;font:inherit}
+.vid-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.vid-btn{position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;background:var(--signal);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.35);transition:transform .15s ease}
+.vid-btn svg{width:44px;height:44px;fill:var(--on-signal)}
+.vid-play:hover .vid-btn{transform:scale(1.06)}
+.vid-play:focus-visible{outline:3px solid var(--signal);outline-offset:-6px}
+.vid-label{position:absolute;left:50%;top:calc(50% + 58px);transform:translateX(-50%);max-width:90%;padding:8px 16px;border-radius:999px;background:rgba(23,24,26,.82);color:#fff;font:700 1rem/1.2 var(--font-body);text-align:center}
+.vid-box video{position:absolute;inset:0;width:100%;height:100%;display:block;background:#17181A}
+@media (min-width:641px){.vid-box{max-width:880px;aspect-ratio:16/9}}
+@media (prefers-reduced-motion:reduce){.vid-btn{transition:none}}

@@ -165,6 +165,15 @@ def build(cfg, mode, out):
                               {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]}
         (d / "site.webmanifest").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     shutil.copy2(brand_dir / theme / "og.png", out / "og.png")   # alte Adresse des Teilen-Bilds bleibt erreichbar
+    # Erklärvideo: nur für Websites mit "video": true in sites/*.json; Dateien aus assets/video/<name>/
+    vid_dir = ROOT / "assets/video" / cfg["brand"]
+    if cfg.get("video") and vid_dir.is_dir():
+        (out / "video").mkdir(exist_ok=True)
+        for f in vid_dir.iterdir():
+            shutil.copy2(f, out / "video" / f.name)
+        page = page.replace("  <!--VIDEO-->\n", "").replace("  <!--/VIDEO-->\n", "")
+    else:
+        page = re.sub(r"  <!--VIDEO-->.*?<!--/VIDEO-->\n\n?", "", page, flags=re.S)
     (out / "index.html").write_text(page, encoding="utf-8")
     # Admin-Bereich: Farbthema wählen (nicht für Suchmaschinen)
     adm = (ROOT / "src/admin.html").read_text(encoding="utf-8")

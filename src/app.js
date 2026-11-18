@@ -932,3 +932,24 @@
 
   window.__tank = { understand: understand, setLang: setLang, openChat: openChat, stateAt: stateAt, resolveFix: resolveFix, kmBetween: kmBetween, setFix: function (lat, lon) { fix = resolveFix(lat, lon, 12); if (fix.region) { setRegion(fix.region); } locState = 'ok'; renderLocator(); return fix; } };
 })();
+
+/* Erklärvideo: Vorschaubild passend zu Sprache und Bildschirm, Video erst nach dem Antippen laden */
+(function () {
+  var box = document.getElementById('vid-box'); if (!box) { return; }
+  var btn = document.getElementById('vid-play'), img = document.getElementById('vid-poster');
+  var wide = window.matchMedia ? window.matchMedia('(min-width: 641px)') : { matches: true };
+  function name() { return (document.documentElement.lang === 'tr' ? 'tr' : 'de') + (wide.matches ? '-h' : '-v'); }
+  function poster() { if (img && img.parentNode) { var s = 'video/' + name() + '.jpg'; if (img.getAttribute('src') !== s) { img.setAttribute('src', s); } } }
+  poster();
+  if (wide.addEventListener) { wide.addEventListener('change', poster); } else if (wide.addListener) { wide.addListener(poster); }
+  if (window.MutationObserver) { new MutationObserver(poster).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] }); }
+  btn.addEventListener('click', function () {
+    var n = name(), v = document.createElement('video');
+    v.controls = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto';
+    v.poster = 'video/' + n + '.jpg'; v.src = 'video/' + n + '.mp4';
+    v.setAttribute('aria-labelledby', 'vid-h');
+    box.replaceChild(v, btn);
+    var pr = v.play(); if (pr && pr.catch) { pr.catch(function () {}); }
+    v.focus();
+  });
+})();
