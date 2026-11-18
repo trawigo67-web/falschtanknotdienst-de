@@ -31,9 +31,9 @@ an der nächsten sicheren Stelle anhalten, Motor abstellen, nicht erneut starten
 
     P.append(dict(slug="falsch-getankt", short="Falsch getankt: was tun?",
         title="Falsch getankt? Was Sie jetzt tun sollten | {brand}",
-        desc="Falsch getankt: Motor aus lassen, Zündung aus, Tank abpumpen lassen. Was bei Benzin im Diesel, Diesel im Benziner und AdBlue gilt.",
+        desc="Falsch getankt: Motor aus lassen, Zündung aus, Tank abpumpen lassen. Was bei Benzin statt Diesel, Diesel statt Benzin und AdBlue gilt, auch wenn Sie schon gefahren sind.",
         h1="Falsch getankt: was Sie jetzt tun sollten",
-        lead="Wer an der Zapfsäule den falschen Kraftstoff erwischt, kann den Schaden meist klein halten. Entscheidend ist, was in den nächsten Minuten passiert.",
+        lead="Wer an der Zapfsäule den falschen Kraftstoff erwischt, kann den Schaden bei einer Falschbetankung meist klein halten. Entscheidend ist, was in den nächsten Minuten passiert.",
         body=first + """
 <h2>Die ersten Schritte</h2>
 <ol>
@@ -41,12 +41,12 @@ an der nächsten sicheren Stelle anhalten, Motor abstellen, nicht erneut starten
 <li><strong>Motor nicht starten, Zündung aus lassen.</strong> Bei manchen Autos läuft die Kraftstoffpumpe schon an, wenn die Fahrertür geöffnet oder die Zündung eingeschaltet wird. Dann gelangt das Gemisch aus dem Tank in die Leitungen.</li>
 <li><strong>Schon losgefahren?</strong> Anhalten, sobald es sicher geht, Motor abstellen und nicht erneut starten.</li>
 <li><strong>Fahrzeug nicht selbst leeren.</strong> Kraftstoff ist leicht entzündlich und muss fachgerecht entsorgt werden.</li>
-<li><strong>Anrufen.</strong> Wir sagen Ihnen am Telefon den Preis und wann wir da sind, und pumpen den Tank direkt vor Ort ab.</li>
+<li><strong>Anrufen.</strong> Unser Abpumpservice sagt Ihnen am Telefon den Preis und wann wir da sind, und pumpt den Tank direkt vor Ort ab. Sie brauchen keinen Abschleppwagen.</li>
 </ol>
 <h2>Welcher Fall liegt vor?</h2>
 <ul class="pg-cards">
-<li><a href="/benzin-im-diesel/"><strong>Benzin im Diesel</strong><span>Der häufigste und heikelste Fall.</span></a></li>
-<li><a href="/diesel-im-benziner/"><strong>Diesel im Benziner</strong><span>Seltener, weil der Stutzen meist kleiner ist.</span></a></li>
+<li><a href="/benzin-im-diesel/"><strong>Benzin statt Diesel</strong><span>Der häufigste und heikelste Fall, auch Super oder E10 im Diesel.</span></a></li>
+<li><a href="/diesel-im-benziner/"><strong>Diesel statt Benzin</strong><span>Seltener, weil der Stutzen meist kleiner ist.</span></a></li>
 <li><a href="/adblue-im-dieseltank/"><strong>AdBlue im Dieseltank</strong><span>Zündung aus lassen ist hier besonders wichtig.</span></a></li>
 <li><a href="/motorrad/"><strong>Motorrad</strong><span>Diesel im Benziner, E10 ohne Freigabe.</span></a></li>
 <li><a href="/transporter-lkw/"><strong>Transporter und Lkw</strong><span>Auch große Tanks, auch AdBlue.</span></a></li>
@@ -59,19 +59,22 @@ an der nächsten sicheren Stelle anhalten, Motor abstellen, nicht erneut starten
 <p>In der Regel zahlt der Fahrer selbst; die Kfz-Haftpflicht springt meist nicht ein. Manche Schutzbriefe übernehmen einen Teil. Mehr dazu: <a href="/versicherung/">Zahlt die Versicherung?</a> und <a href="/kosten/">Was das Abpumpen kostet</a>.</p>
 """))
 
-    P.append(dict(slug="benzin-im-diesel", short="Benzin im Diesel",
-        title="Benzin im Diesel getankt? Was jetzt zu tun ist | {brand}",
-        desc="Benzin statt Diesel getankt: Warum schon wenig Benzin moderne Diesel schädigen kann, was Sie jetzt tun und wie das Abpumpen vor Ort abläuft.",
-        h1="Benzin im Diesel getankt",
-        lead="Der häufigste Fall an der Zapfsäule: Die Benzinpistole passt problemlos in den Dieselstutzen. Für moderne Dieselmotoren ist das ernst.",
+    P.append(dict(slug="benzin-im-diesel", short="Benzin statt Diesel",
+        title="Benzin statt Diesel getankt und gefahren? | {brand}",
+        desc="Benzin statt Diesel getankt, vielleicht schon gefahren? Woran Sie es merken, was jetzt zu tun ist, was es kostet und wie das Abpumpen vor Ort abläuft.",
+        h1="Benzin statt Diesel getankt",
+        lead="Der häufigste Fall an der Zapfsäule: Die Benzinpistole passt problemlos in den Dieselstutzen. Ob Super, Super Plus oder E10, für den Diesel ist es Benzin. Für moderne Dieselmotoren ist das ernst.",
         body=first + """
 <h2>Warum Benzin dem Diesel schadet</h2>
 <p>Dieselkraftstoff schmiert die Hochdruckpumpe und die Einspritzdüsen mit. Benzin tut das nicht. Läuft der Motor mit dem Gemisch, kann das Einspritzsystem Schaden nehmen. Dann müssen im schlimmsten Fall Hochdruckpumpe, Injektoren, Leitungen und Tank getauscht werden, was mehrere tausend Euro kosten kann.</p>
 <p>Dass ein paar Liter Benzin im Diesel nichts ausmachen, galt für alte Vorkammer- und Wirbelkammer-Diesel. Bei heutigen Motoren mit Common-Rail- oder Pumpe-Düse-Einspritzung stimmt das nicht mehr.</p>
 <h2>Solange der Motor nicht gelaufen ist</h2>
 <p>Dann ist das Gemisch nur im Tank. Der Tank wird abgepumpt, das System gespült, und Sie tanken richtigen Diesel. In aller Regel können Sie danach weiterfahren.</p>
-<h2>Wenn Sie schon gefahren sind</h2>
+<h2>Benzin statt Diesel getankt und gefahren</h2>
+<p>Typische Anzeichen: Der Motor läuft unruhig oder klopft, verliert Leistung, ruckelt oder geht aus und springt danach schlecht an. Manchmal merken Sie zunächst gar nichts, wenn nur wenig Benzin im Tank ist. Verlassen Sie sich nicht darauf.</p>
 <p>Anhalten, Motor aus, nicht erneut starten. Sagen Sie uns am Telefon, wie weit Sie gefahren sind und ob der Motor unruhig lief. Oft reichen auch dann Abpumpen und Spülen. Ob zusätzlich eine Werkstatt nötig ist, sagen wir Ihnen ehrlich.</p>
+<h2>Was kostet das?</h2>
+<p>Solange der Motor nicht gelaufen ist, ist Abpumpen meist die günstigste Lösung. Den Festpreis nennen wir Ihnen am Telefon. Mehr dazu: <a href="/kosten/">Kosten</a> und <a href="/versicherung/">Zahlt die Versicherung?</a></p>
 <h2>So läuft der Einsatz</h2>
 <ol>
 <li>Sie rufen an und sagen, wo Sie stehen, welches Auto und wie viel getankt wurde.</li>
@@ -79,22 +82,24 @@ an der nächsten sicheren Stelle anhalten, Motor abstellen, nicht erneut starten
 <li>Wir pumpen das Gemisch vor Ort ab, spülen und füllen richtigen Kraftstoff auf.</li>
 <li>Den abgepumpten Kraftstoff nehmen wir zur fachgerechten Entsorgung mit.</li>
 </ol>
-<p>Andere Fälle: <a href="/diesel-im-benziner/">Diesel im Benziner</a> · <a href="/adblue-im-dieseltank/">AdBlue im Dieseltank</a> · <a href="/falsch-getankt/">alle Sofortmaßnahmen</a></p>
+<p>Andere Fälle: <a href="/diesel-im-benziner/">Diesel statt Benzin</a> · <a href="/adblue-im-dieseltank/">AdBlue im Dieseltank</a> · <a href="/falsch-getankt/">alle Sofortmaßnahmen</a></p>
 """))
 
-    P.append(dict(slug="diesel-im-benziner", short="Diesel im Benziner",
-        title="Diesel im Benziner getankt? Was jetzt zu tun ist | {brand}",
-        desc="Diesel statt Benzin getankt: Motor aus lassen, Menge prüfen, Tank abpumpen lassen. Was Diesel im Benzinmotor anrichtet und wie wir vor Ort helfen.",
-        h1="Diesel im Benziner getankt",
+    P.append(dict(slug="diesel-im-benziner", short="Diesel statt Benzin",
+        title="Diesel statt Benzin getankt und gefahren? | {brand}",
+        desc="Diesel statt Benzin getankt, vielleicht schon gefahren? Woran Sie es merken, was Diesel im Benzinmotor anrichtet und wie wir den Tank vor Ort abpumpen.",
+        h1="Diesel statt Benzin getankt",
         lead="Seltener als der umgekehrte Fall, weil die Dieselpistole bei vielen Autos nicht in den Benzinstutzen passt. Bei aktuellen Modellen klappt es trotzdem oft.",
         body=first + """
 <h2>Was Diesel im Benzinmotor anrichtet</h2>
 <p>Diesel zündet im Benzinmotor schlecht. Der Motor läuft unrund, ruckelt oder geht aus. Schäden an der Einspritzanlage und an der Abgasreinigung, etwa am Katalysator, sind nicht auszuschließen.</p>
+<h2>Diesel statt Benzin getankt und gefahren: woran Sie es merken</h2>
+<p>Meist schon nach kurzer Strecke: Der Motor ruckelt, verliert Leistung, qualmt aus dem Auspuff oder geht aus. Dann anhalten, sobald es sicher geht, Motor abstellen und nicht erneut starten.</p>
 <h2>Kommt es auf die Menge an?</h2>
 <p>Ja. Wenige Liter Diesel in einem fast vollen Benzintank sind weniger kritisch als ein halb voller Tank Diesel. Was für Ihr Auto gilt, steht in der Betriebsanleitung. Im Zweifel: Motor aus lassen und anrufen. Am Telefon klären wir mit Ihnen, ob Abpumpen nötig ist.</p>
 <h2>So helfen wir</h2>
 <p>Wir pumpen den Tank vor Ort ab, spülen das Kraftstoffsystem und füllen richtigen Kraftstoff auf. Ohne Abschleppen und ohne Werkstatttermin. Den Festpreis nennen wir Ihnen vorab am Telefon.</p>
-<p>Andere Fälle: <a href="/benzin-im-diesel/">Benzin im Diesel</a> · <a href="/adblue-im-dieseltank/">AdBlue im Dieseltank</a> · <a href="/falsch-getankt/">alle Sofortmaßnahmen</a></p>
+<p>Andere Fälle: <a href="/benzin-im-diesel/">Benzin statt Diesel</a> · <a href="/adblue-im-dieseltank/">AdBlue im Dieseltank</a> · <a href="/falsch-getankt/">alle Sofortmaßnahmen</a></p>
 """))
 
     P.append(dict(slug="adblue-im-dieseltank", short="AdBlue im Dieseltank",
@@ -113,10 +118,10 @@ an der nächsten sicheren Stelle anhalten, Motor abstellen, nicht erneut starten
 """))
 
     P.append(dict(slug="kosten", short="Kosten",
-        title="Abpumpen nach Falschbetankung: Kosten | {brand}",
+        title="Tank abpumpen nach Falschbetankung: Kosten | {brand}",
         desc="Abpumpen nach Falschbetankung: Pkw ab %s €, Wohnmobil ab %s €. Festpreis am Telefon, bevor wir losfahren. Wer die Kosten trägt und wie Sie bezahlen." % (car, camper),
         h1="Was das Abpumpen kostet",
-        lead="Sie erfahren den Preis am Telefon, bevor wir losfahren. Erst wenn Sie zustimmen, kommen wir.",
+        lead="Was kostet es, den Tank abpumpen zu lassen? Sie erfahren den Festpreis am Telefon, bevor wir losfahren. Erst wenn Sie zustimmen, kommen wir.",
         body="""
 <div class="pg-prices"><div><span>Pkw</span><strong>ab %s €</strong><small>Abpumpen und Spülen</small></div><div><span>Wohnmobil</span><strong>ab %s €</strong><small>Größerer Tank, längere Absaugung</small></div></div>
 <h2>Wovon der Preis abhängt</h2>
@@ -136,7 +141,7 @@ an der nächsten sicheren Stelle anhalten, Motor abstellen, nicht erneut starten
 """ % (car, camper)))
 
     P.append(dict(slug="versicherung", short="Zahlt die Versicherung?",
-        title="Falsch getankt: Zahlt die Versicherung? | {brand}",
+        title="Falschbetankung: Zahlt die Versicherung? | {brand}",
         desc="Haftpflicht, Teilkasko, Vollkasko, Schutzbrief: wer bei Falschbetankung zahlt, was im Vertrag steht und was Sie für die Versicherung festhalten sollten.",
         h1="Falsch getankt: Zahlt die Versicherung?",
         lead="Meistens nicht. Ganz ausgeschlossen ist es aber nicht. Entscheidend sind Ihr Vertrag und wie es zur Falschbetankung kam.",
@@ -244,7 +249,7 @@ an der nächsten sicheren Stelle anhalten, Motor abstellen, nicht erneut starten
              note="In Bayern fährt unser fester Servicepartner."),
     ]
     for r in regions:
-        r.update(lead="Sie stehen mit falschem Kraftstoff im Tank? Lassen Sie den Motor aus und rufen Sie an. Hier erreichen Sie das zuständige Team direkt.",
+        r.update(lead="Sie stehen mit falschem Kraftstoff im Tank und suchen einen Abpumpservice in der Nähe? Lassen Sie den Motor aus und rufen Sie an. Hier erreichen Sie das zuständige Notdienst-Team direkt.",
                  calls=[r["key"]], service_area=r["area"],
                  body=first + """
 <h2>Hier sind wir unterwegs</h2>
