@@ -96,13 +96,15 @@ def build(cfg, mode, out):
         page = re.sub(r'\n\s*"footer\.alias": "[^"]*",', "", page)
     faq = re.findall(r'<summary><span data-i18n="faq\.q\d+">(.*?)</span>.*?</summary>\s*<p data-i18n="faq\.a\d+">(.*?)</p>', page, re.S)
     ld = [{
-        "@context": "https://schema.org", "@type": ["AutomotiveBusiness", "EmergencyService"],
+        "@context": "https://schema.org", "@type": "AutomotiveBusiness",
         "name": display, "description": "Mobiler Abpumpservice bei Falschbetankung: Benzin im Diesel, Diesel im Benziner, AdBlue.",
         "url": url, "telephone": cfg["regions"]["west"]["tel"], "priceRange": "ab %s €" % cfg["price"]["car"],
         "logo": url + "brand/%s/icon-512.png" % theme, "image": url + "brand/%s/og.png" % theme,
         "address": {"@type": "PostalAddress", "streetAddress": cfg["street"], "postalCode": cfg["city"].split(" ")[0],
                     "addressLocality": cfg["city"].split(" ", 1)[1], "addressCountry": "DE"},
-        "areaServed": ["Nordrhein-Westfalen", "Hessen", "Rheinland-Pfalz", "Bayern"],
+        "areaServed": ["Nordrhein-Westfalen", "Hessen", "Rheinland-Pfalz", "Bayern", "Frankfurt am Main", "Rhein-Main-Gebiet"],
+        "sameAs": [v for v in cfg.get("reviews", {}).values()],
+        "knowsAbout": ["Falschbetankung", "Benzin im Diesel", "Diesel im Benziner", "AdBlue im Dieseltank", "Kraftstoff abpumpen"],
         "openingHoursSpecification": {"@type": "OpeningHoursSpecification",
             "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "00:00", "closes": "23:59"},
         "contactPoint": [
@@ -195,12 +197,26 @@ def build(cfg, mode, out):
         if rest:
             sys.exit("Unersetzte Platzhalter im Sprachpaket %s: %s" % (code, rest))
         (out / "lang" / (code + ".js")).write_text(text, encoding="utf-8")
+    # Unterseiten (Ratgeber, Kosten, Einsatzgebiete): eigene Adressen mit Inhalt, der ohne JavaScript lesbar ist
+    import pages as pagesmod
+    base_css = (css.split("/* Karte:")[0]).replace('url("fonts/', 'url("/fonts/') + "\n" + theme_css(themes)
+    plist = pagesmod.pages(cfg)
+    canon_base = canon if canon.endswith("/") else canon + "/"
+    for p in plist:
+        d = out / p["slug"]; d.mkdir(parents=True, exist_ok=True)
+        (d / "index.html").write_text(pagesmod.render(cfg, p, base_css, theme, url, canon_base, display, cfg["brandHtml"], plist), encoding="utf-8")
+    if mode == "site":
+        urls = [url] + [url + p["slug"] + "/" for p in plist]
+        if canon_base == url:
+            (out / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n'
+                % "".join("  <url><loc>%s</loc></url>\n" % u for u in urls), encoding="utf-8")
+        else:  # Zweitadresse: verweist per Canonical auf die Hauptadresse, deshalb nur die Startseite
+            (out / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>%s</loc></url>\n</urlset>\n' % url, encoding="utf-8")
     if mode == "site":
         (out / "CNAME").write_text(cfg["domain"] + "\n", encoding="utf-8")
         (out / ".nojekyll").write_text("", encoding="utf-8")
         (out / "theme.txt").write_text(theme + "\n", encoding="utf-8")
         (out / "robots.txt").write_text("User-agent: *\nAllow: /\nDisallow: /admin/\n\nSitemap: %ssitemap.xml\n" % url, encoding="utf-8")
-        (out / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>%s</loc></url>\n</urlset>\n' % url, encoding="utf-8")
         nf = (ROOT / "src/404.html").read_text(encoding="utf-8")
         for k, v in rep.items():
             nf = nf.replace("{{%s}}" % k, v)

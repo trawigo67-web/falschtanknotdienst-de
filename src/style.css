@@ -591,3 +591,6 @@ svg{direction:ltr}
 .vid-box video{position:absolute;inset:0;width:100%;height:100%;display:block;background:#17181A}
 @media (min-width:641px){.vid-box{max-width:880px;aspect-ratio:16/9}}
 @media (prefers-reduced-motion:reduce){.vid-btn{transition:none}}
+
+.footer-guide{display:flex;flex-wrap:wrap;gap:8px 18px;padding-top:18px;padding-bottom:6px;font-size:.9375rem}
+.footer-guide a{color:inherit;opacity:.9}
