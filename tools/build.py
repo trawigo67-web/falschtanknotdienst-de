@@ -137,9 +137,9 @@ def build(cfg, mode, out):
         for f in (ROOT / "assets" / sub).iterdir():
             shutil.copy2(f, out / sub / f.name)
     manifest = {"name": display + " – Soforthilfe bei Falschbetankung", "short_name": cfg.get("short", display)[:12], "lang": "de",
-                "start_url": "./", "display": "standalone", "background_color": "#EEF3F2", "theme_color": "#0B4650",
-                "icons": [{"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-                          {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]}
+                "start_url": "./", "display": "standalone", "background_color": "#EEF3F2", "theme_color": themes[theme]["sign"],
+                "icons": [{"src": "icons/%s-192.png" % theme, "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+                          {"src": "icons/%s-512.png" % theme, "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]}
     (out / "site.webmanifest").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     (out / "index.html").write_text(page, encoding="utf-8")
     # Admin-Bereich: Farbthema wählen (nicht für Suchmaschinen)
@@ -148,7 +148,7 @@ def build(cfg, mode, out):
     own = "trawigo67-web/" + cfg["domain"].replace(".", "-")
     adm = (adm.replace("{{THEMES_JSON}}", json.dumps(themes, ensure_ascii=False))
               .replace("{{REPOS_JSON}}", json.dumps(repos)).replace("{{OWN_REPO}}", json.dumps(own if own in repos else (repos[0] if repos else own)))
-              .replace("{{DISPLAY}}", htmlmod.escape(display)))
+              .replace("{{DISPLAY}}", htmlmod.escape(display)).replace("{{THEME}}", theme))
     (out / "admin").mkdir(exist_ok=True)
     (out / "admin" / "index.html").write_text(adm, encoding="utf-8")
     # Sprachpakete, die erst bei Bedarf geladen werden
