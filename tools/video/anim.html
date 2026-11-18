@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:SSC;src:url(file:///home/claude/src-new/assets/fonts/ssc-latin.woff2);font-weight:100 900}
+html,body{margin:0;background:#F7F3F6;overflow:hidden}
+svg{display:block}
+text{font-family:Inter,'Inter Display',sans-serif}
+.h{font-weight:800;font-size:84px;fill:#1F1620;letter-spacing:-1.5px}
+.s{font-weight:500;font-size:40px;fill:#5C4E57}
+.chip{font-weight:700;font-size:28px;fill:#fff;letter-spacing:1px}
+</style></head><body>
+<svg id="root" xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<defs>
+  <linearGradient id="mag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E2338C"/><stop offset="1" stop-color="#8F0A4E"/></linearGradient>
+  <linearGradient id="end" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C8146F"/><stop offset="1" stop-color="#5E0633"/></linearGradient>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBF7FA"/><stop offset="1" stop-color="#F1E8EE"/></linearGradient>
+
+  <!-- Logo-Zeichen (aus der Website) -->
+  <g id="mark"><g transform="translate(100 100) scale(.81) translate(-113 -125)"><path d="M139 50A64 64 0 0 1 87.8 166.9" fill="none" stroke="#FF8A1F" stroke-width="15" stroke-linecap="round"/><path d="M98.4 144 53.6 155.8 83 191.6z" fill="#FF8A1F"/><g transform="translate(-6 -9) rotate(-24 108 92)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"><rect x="82" y="60" width="66" height="36" rx="11" fill="#fff" stroke="none"/><rect x="141" y="65" width="17" height="26" rx="6" fill="#fff" stroke="none"/><rect x="75" y="66" width="13" height="24" rx="4" fill="#fff" stroke="none"/><path d="M84 78H65q-9 0-13 8l-7 13" stroke-width="15.5"/><path d="M98 96v20a11 11 0 0 0 11 11h18a11 11 0 0 0 11-11V96" stroke-width="9.5"/></g></g></g>
+  <g id="tile"><rect width="200" height="200" rx="44" fill="url(#mag)"/><use href="#mark"/></g>
+
+  <!-- Auto, Front rechts, 540 x 217 -->
+  <g id="car">
+    <ellipse cx="270" cy="219" rx="250" ry="10" fill="#1F1620" opacity=".12"/>
+    <path d="M20 150Q20 112 60 106L132 96Q172 40 252 40L342 40Q402 40 442 96L492 106Q522 112 522 150L522 166Q522 177 511 177L31 177Q20 177 20 166Z" fill="#3A3F45"/>
+    <path d="M152 96Q182 56 252 56L276 56L276 96Z" fill="#CFE3EA"/>
+    <path d="M292 56L342 56Q386 56 418 96L292 96Z" fill="#CFE3EA"/>
+    <rect x="20" y="140" width="502" height="10" fill="#2C2E32"/>
+    <circle cx="70" cy="122" r="13" fill="#55585E"/>
+    <rect x="300" y="110" width="34" height="8" rx="4" fill="#23262A"/>
+    <circle cx="130" cy="175" r="42" fill="#17181A"/><circle cx="130" cy="175" r="19" fill="#BCBEC3"/>
+    <circle cx="412" cy="175" r="42" fill="#17181A"/><circle cx="412" cy="175" r="19" fill="#BCBEC3"/>
+    <rect x="498" y="116" width="22" height="16" rx="6" fill="#FFE7A8"/>
+    <rect x="22" y="116" width="18" height="16" rx="6" fill="#D92D20"/>
+  </g>
+  <g id="blink"><circle cx="512" cy="140" r="15" fill="#FF8A1F"/><circle cx="30" cy="140" r="15" fill="#FF8A1F"/><circle cx="512" cy="140" r="34" fill="#FF8A1F" opacity=".28"/><circle cx="30" cy="140" r="34" fill="#FF8A1F" opacity=".28"/></g>
+
+  <!-- Servicewagen, Front rechts, 540 x 236 -->
+  <g id="van">
+    <ellipse cx="270" cy="238" rx="262" ry="10" fill="#1F1620" opacity=".12"/>
+    <path d="M10 44Q10 22 32 22L372 22Q420 22 450 74L478 122Q528 128 528 164L528 196L10 196Z" fill="url(#mag)"/>
+    <path d="M386 44Q412 44 430 76L452 118L360 118L360 44Z" fill="#CFE3EA"/>
+    <rect x="10" y="150" width="518" height="12" fill="#7A0843"/>
+    <rect x="30" y="50" width="78" height="78" rx="18" fill="#fff" opacity=".16"/>
+    <g transform="translate(30 50) scale(.39)"><use href="#mark"/></g>
+    <text x="124" y="84" font-size="27" font-weight="800" fill="#fff" id="tVan1">Falschtank-</text>
+    <text x="124" y="118" font-size="27" font-weight="800" fill="#FF8A1F" id="tVan2">Notdienst</text>
+    <circle cx="118" cy="194" r="42" fill="#17181A"/><circle cx="118" cy="194" r="19" fill="#BCBEC3"/>
+    <circle cx="420" cy="194" r="42" fill="#17181A"/><circle cx="420" cy="194" r="19" fill="#BCBEC3"/>
+    <rect x="506" y="140" width="22" height="16" rx="6" fill="#FFE7A8"/>
+  </g>
+
+  <!-- Zapfsäule 220 x 340 -->
+  <g id="pump">
+    <rect x="-20" y="318" width="260" height="22" rx="6" fill="#55585E"/>
+    <rect x="0" y="0" width="220" height="320" rx="22" fill="url(#mag)"/>
+    <rect x="26" y="30" width="168" height="92" rx="12" fill="#1F1620"/>
+    <text x="110" y="92" text-anchor="middle" font-size="40" font-weight="800" fill="#FF8A1F" id="tPump">DIESEL</text>
+    <rect x="26" y="146" width="168" height="16" rx="8" fill="#fff" opacity=".35"/>
+    <rect x="26" y="176" width="110" height="16" rx="8" fill="#fff" opacity=".35"/>
+  </g>
+
+  <g id="check"><circle r="40" fill="#1F9D55"/><path d="M-18 2L-5 15L19 -12" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <g id="ban"><circle r="210" fill="none" stroke="#D92D20" stroke-width="38"/><path d="M-148 -148L148 148" stroke="#D92D20" stroke-width="38" stroke-linecap="round"/></g>
+</defs>
+
+<rect id="bg" width="1920" height="1080" fill="url(#sky)"/>
+
+<!-- Kopfzeile -->
+<g id="top">
+  <g transform="translate(120 44) scale(.36)"><use href="#tile"/></g>
+  <text id="tWord" x="210" y="92" font-size="36" font-weight="800"></text>
+</g>
+<g id="dots" transform="translate(1560 80)"></g>
+
+<g id="stage">
+<rect id="ground" x="-3000" y="760" width="9000" height="10" fill="#D9CCD4"/>
+
+<!-- ===== Szene 1 ===== -->
+<g id="s1">
+  <use href="#pump" transform="translate(250 420)"/>
+  <path d="M470 520C580 520 560 730 660 700S705 630 728 616" fill="none" stroke="#1F1620" stroke-width="14" stroke-linecap="round"/>
+  <use href="#car" transform="translate(620 434) scale(1.5)"/>
+  <rect x="700" y="596" width="62" height="30" rx="8" fill="#FF8A1F" transform="rotate(-18 728 612)"/>
+  <g id="s1tag"><rect x="915" y="250" width="360" height="84" rx="42" fill="#1F1620"/><text id="tTag" x="1095" y="306" text-anchor="middle" font-size="40" font-weight="700" fill="#fff">Benziner</text><path d="M1070 334L1095 366L1120 334Z" fill="#1F1620"/></g>
+  <g id="s1bang"><circle cx="1480" cy="400" r="96" fill="#FF8A1F"/><text x="1480" y="446" text-anchor="middle" font-size="130" font-weight="900" fill="#1C1305">!</text></g>
+</g>
+
+<!-- ===== Szene 2 ===== -->
+<g id="s2">
+  <g id="s2btn" transform="translate(640 440)">
+    <circle r="190" fill="#BCBEC3"/><circle r="164" fill="#2C2E32"/><circle r="140" fill="none" stroke="#FF8A1F" stroke-width="6"/>
+    <text y="-22" text-anchor="middle" font-size="54" font-weight="800" fill="#fff">START</text>
+    <text y="36" text-anchor="middle" font-size="54" font-weight="800" fill="#fff">STOP</text>
+    <text y="84" text-anchor="middle" font-size="26" font-weight="600" fill="#BCBEC3">ENGINE</text>
+  </g>
+  <g id="s2ban1" transform="translate(640 440)"><use href="#ban"/></g>
+  <g id="s2key" transform="translate(1280 440)">
+    <rect x="-20" y="-20" width="230" height="40" rx="10" fill="#8A7C85"/>
+    <rect x="110" y="20" width="26" height="30" fill="#8A7C85"/><rect x="156" y="20" width="26" height="44" fill="#8A7C85"/>
+    <rect x="-150" y="-80" width="170" height="160" rx="40" fill="#2C2E32"/>
+    <circle cx="-100" cy="0" r="22" fill="#F7F3F6"/>
+    <text x="-45" y="14" text-anchor="middle" font-size="36" font-weight="800" fill="#FF8A1F">ON</text>
+  </g>
+  <g id="s2ban2" transform="translate(1300 440)"><use href="#ban"/></g>
+</g>
+
+<!-- ===== Szene 3 ===== -->
+<g id="s3">
+  <path d="M-400 720Q0 700 0 700Q300 610 620 690T1240 680T1920 700L2400 720L2400 760L-400 760Z" fill="#EADCE5"/>
+  <rect x="-3000" y="770" width="9000" height="34" fill="#55585E"/>
+  <g id="s3lane"></g>
+  <g id="s3car"><use href="#car" transform="scale(1.5)"/><use id="s3blink" href="#blink" transform="scale(1.5)"/></g>
+  <g id="s3chip1"><rect x="-225" y="-44" width="450" height="88" rx="44" fill="#1F1620"/><use href="#check" transform="translate(-181 0) scale(.82)"/><text x="36" y="14" text-anchor="middle" font-size="40" font-weight="700" fill="#fff" id="tChip1">Sicher anhalten</text></g>
+  <g id="s3chip2"><rect x="-200" y="-44" width="400" height="88" rx="44" fill="#1F1620"/><use href="#check" transform="translate(-156 0) scale(.82)"/><text x="34" y="14" text-anchor="middle" font-size="40" font-weight="700" fill="#fff" id="tChip2">Motor aus</text></g>
+</g>
+
+<!-- ===== Szene 4 ===== -->
+<g id="s4">
+  <use href="#pump" transform="translate(120 420)"/>
+  <g id="s4grp">
+    <g id="s4man" fill="none" stroke="#1F1620" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+      <path id="s4leg1" d=""/><path id="s4leg2" d=""/>
+      <path d="M-70 -150L-10 -262"/>
+      <path d="M-14 -250L78 -214"/>
+      <circle cx="12" cy="-300" r="30" fill="#1F1620" stroke="none"/>
+    </g>
+    <g transform="translate(60 -326)"><use href="#car" transform="scale(1.5)"/><use id="s4blink" href="#blink" transform="scale(1.5)"/></g>
+  </g>
+  <g id="s4arrow"><path d="M0 0L150 0" stroke="#FF8A1F" stroke-width="16" stroke-linecap="round"/><path d="M130 -34L176 0L130 34" fill="none" stroke="#FF8A1F" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></g>
+</g>
+
+<!-- ===== Szene 5 ===== -->
+<g id="s5">
+  <g id="s5phone" transform="translate(470 440)">
+    <rect x="-170" y="-290" width="340" height="590" rx="48" fill="#1F1620"/>
+    <rect x="-150" y="-262" width="300" height="534" rx="30" fill="#2C2E32"/>
+    <circle id="s5r1" r="80" fill="none" stroke="#FF8A1F" stroke-width="6" cy="-40"/>
+    <circle id="s5r2" r="80" fill="none" stroke="#FF8A1F" stroke-width="6" cy="-40"/>
+    <circle r="78" cy="-40" fill="#FF8A1F"/>
+    <g transform="translate(-48 -88) scale(4)"><path d="M8.4 3.4 5.3 4.3c-.9 6 5.2 14.7 13.4 15.4l1.1-3-3.7-2.3-1.9 1.7c-2.2-1.1-4.2-3.5-5-5.7l1.8-1.7z" fill="#1C1305"/></g>
+    <text y="120" text-anchor="middle" font-size="38" font-weight="800" fill="#fff" id="tCall">Jetzt anrufen</text>
+    <text y="168" text-anchor="middle" font-size="26" font-weight="500" fill="#BCBEC3" id="tCallSub">Falschtank-Notdienst</text>
+  </g>
+  <g id="s5list"></g>
+  <g id="s5price"><rect x="900" y="640" width="640" height="92" rx="46" fill="#C8146F"/><text x="1220" y="700" text-anchor="middle" font-size="40" font-weight="800" fill="#fff" id="tPrice">Festpreis direkt am Telefon</text></g>
+</g>
+
+<!-- ===== Szene 6 ===== -->
+<g id="s6">
+  <use href="#car" transform="translate(1060 434) scale(1.5)"/>
+  <g id="s6van"><use href="#van" transform="scale(1.45)"/><g id="s6beacon"><rect x="250" y="12" width="60" height="22" rx="8" fill="#FF8A1F"/><circle id="s6glow" cx="280" cy="20" r="56" fill="#FF8A1F" opacity=".3"/></g></g>
+  <g id="s6hose">
+    <path id="s6h" d="M790 650C880 760 1040 760 1165 616" fill="none" stroke="#1F1620" stroke-width="16" stroke-linecap="round"/>
+    <path id="s6flow" d="M1165 616C1040 760 880 760 790 650" fill="none" stroke="#FF8A1F" stroke-width="6" stroke-linecap="round" stroke-dasharray="18 26"/>
+  </g>
+  <g id="s6gauge" transform="translate(1130 250)">
+    <rect x="0" y="0" width="520" height="130" rx="26" fill="#1F1620"/>
+    <text id="s6gt" x="28" y="50" font-size="32" font-weight="700" fill="#fff">Falscher Kraftstoff im Tank</text>
+    <rect x="28" y="72" width="464" height="30" rx="15" fill="#55585E"/>
+    <rect id="s6bar" x="28" y="72" width="464" height="30" rx="15" fill="#D92D20"/>
+  </g>
+  <g id="s6done"><rect x="-290" y="-46" width="580" height="92" rx="46" fill="#1F9D55"/><path d="M-246 2L-232 16L-206 -12" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><text x="46" y="14" text-anchor="middle" font-size="38" font-weight="800" fill="#fff" id="tDone">Abgepumpt und gespült</text></g>
+</g>
+
+<!-- ===== Szene 7a ===== -->
+<g id="s7">
+  <use href="#van" transform="translate(20 418) scale(1.45)"/>
+  <g id="s7car"><use href="#car" transform="scale(1.5)"/></g>
+  <g id="s7lines" stroke="#C8146F" stroke-width="12" stroke-linecap="round" opacity=".5"><path d="M-40 60L-160 60"/><path d="M-60 130L-220 130"/><path d="M-40 200L-140 200"/></g>
+</g>
+
+</g>
+<g id="foot"></g>
+<!-- Textzeile -->
+<g id="txt"><g id="chipg"><rect id="chipr" height="50" rx="25" fill="#C8146F"/><text id="chipt" class="chip"></text></g><text id="head" class="h"></text><text id="sub" class="s"></text></g>
+<g id="endc"></g>
+</svg>
+<script src="anim.js"></script></body></html>
