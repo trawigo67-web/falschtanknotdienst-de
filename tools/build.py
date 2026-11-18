@@ -169,12 +169,16 @@ def build(cfg, mode, out):
         d = out / "brand" / key; d.mkdir(parents=True, exist_ok=True)
         for f in (brand_dir / key).iterdir():
             shutil.copy2(f, d / f.name)
+        # favicon.ico (16, 32, 48 px) für Programme, die nur /favicon.ico abfragen (Mail, Lesezeichen, ältere Browser)
+        from PIL import Image
+        Image.open(brand_dir / key / "icon-512.png").convert("RGBA").save(d / "favicon.ico", sizes=[(16, 16), (32, 32), (48, 48)])
         manifest = {"name": display + " – Soforthilfe bei Falschbetankung", "short_name": cfg.get("short", display)[:12], "lang": "de",
                     "start_url": "../../", "scope": "../../", "display": "standalone", "background_color": t["paper"], "theme_color": t["sign"],
                     "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
                               {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]}
         (d / "site.webmanifest").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     shutil.copy2(brand_dir / theme / "og.png", out / "og.png")   # alte Adresse des Teilen-Bilds bleibt erreichbar
+    shutil.copy2(out / "brand" / theme / "favicon.ico", out / "favicon.ico")  # der Admin-Bereich kopiert beide beim Themenwechsel mit
     # Erklärvideo: nur für Websites mit "video": true in sites/*.json; Dateien aus assets/video/<name>/
     vid_dir = ROOT / "assets/video" / cfg["brand"]
     if cfg.get("video") and vid_dir.is_dir():

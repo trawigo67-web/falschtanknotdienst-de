@@ -119,7 +119,10 @@ button.link{background:none;border:0;padding:0;color:var(--muted);text-decoratio
   function fromB64(b) { var bin = atob(b.replace(/\s/g, '')), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) { u[i] = bin.charCodeAt(i); } return new TextDecoder().decode(u); }
   function api(token, repo, path, opts) {
     opts = opts || {};
-    return fetch('https://api.github.com/repos/' + repo + '/contents/' + path, {
+    /* ?ref=main: Browser schicken Abrufe, deren Adresse auf favicon.ico endet, sonst gar nicht erst ab.
+       Beim Lesen wählt es den Zweig main, beim Schreiben ignoriert GitHub den Zusatz (dort gilt "branch" im Inhalt). */
+    if ((opts.method || 'GET') !== 'GET' && opts.body && !opts.body.branch) { opts.body.branch = 'main'; }
+    return fetch('https://api.github.com/repos/' + repo + '/contents/' + path + '?ref=main', {
       method: opts.method || 'GET', cache: 'no-store',
       headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
       body: opts.body ? JSON.stringify(opts.body) : undefined
@@ -150,6 +153,21 @@ button.link{background:none;border:0;padding:0;color:var(--muted);text-decoratio
             var txt = fromB64(f.content), nx = txt.replace(/(\bbrand\/)[a-z]+(\/icon)/g, '$1' + theme + '$2');
             if (nx === txt) { return; }
             return api(token, repo, path, { method: 'PUT', body: { message: msgText, content: toB64(nx), sha: f.sha } });
+          });
+        });
+      }, Promise.resolve());
+    }).then(function () {
+      /* Bilder unter der festen Adresse (/favicon.ico, /og.png) aus brand/<thema>/ übernehmen */
+      return ['favicon.ico', 'og.png'].reduce(function (p, name) {
+        return p.then(function () {
+          return api(token, repo, 'brand/' + theme + '/' + name, { allow404: true }).then(function (src) {
+            if (!src || !src.content) { return; }
+            return api(token, repo, name, { allow404: true }).then(function (cur) {
+              if (cur && cur.sha === src.sha) { return; }
+              var body = { message: msgText, content: src.content.replace(/\s/g, '') };
+              if (cur) { body.sha = cur.sha; }
+              return api(token, repo, name, { method: 'PUT', body: body });
+            });
           });
         });
       }, Promise.resolve());
