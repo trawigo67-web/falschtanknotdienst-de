@@ -48,13 +48,15 @@ an der nächsten sicheren Stelle anhalten, Motor abstellen, nicht erneut starten
 <li><a href="/benzin-im-diesel/"><strong>Benzin im Diesel</strong><span>Der häufigste und heikelste Fall.</span></a></li>
 <li><a href="/diesel-im-benziner/"><strong>Diesel im Benziner</strong><span>Seltener, weil der Stutzen meist kleiner ist.</span></a></li>
 <li><a href="/adblue-im-dieseltank/"><strong>AdBlue im Dieseltank</strong><span>Zündung aus lassen ist hier besonders wichtig.</span></a></li>
+<li><a href="/motorrad/"><strong>Motorrad</strong><span>Diesel im Benziner, E10 ohne Freigabe.</span></a></li>
+<li><a href="/transporter-lkw/"><strong>Transporter und Lkw</strong><span>Auch große Tanks, auch AdBlue.</span></a></li>
 </ul>
 <h2>Was nicht so schlimm ist</h2>
 <p><strong>Super Plus statt Super</strong> ist unkritisch, Sie haben nur mehr bezahlt. <strong>E10 statt E5</strong> ist unbedenklich, wenn Ihr Auto für E10 freigegeben ist; das steht in den Herstellerangaben. Ist es nicht freigegeben, tanken Sie möglichst bald ethanolarmen Kraftstoff nach und fragen Sie im Zweifel kurz bei uns nach.</p>
 <h2>Woran Sie den richtigen Kraftstoff erkennen</h2>
 <p>An der Form des Zeichens auf Zapfpistole und Tankklappe: Ein <strong>Kreis</strong> steht für Benzin (E5, E10), ein <strong>Quadrat</strong> für Diesel (B7). AdBlue gehört nur in den eigenen Einfüllstutzen, meist mit blauem Deckel.</p>
 <h2>Wer die Kosten trägt</h2>
-<p>In der Regel zahlt der Fahrer selbst; die Kfz-Haftpflicht springt meist nicht ein. Manche Schutzbriefe übernehmen einen Teil. Mehr dazu auf der Seite <a href="/kosten/">Was das Abpumpen kostet</a>.</p>
+<p>In der Regel zahlt der Fahrer selbst; die Kfz-Haftpflicht springt meist nicht ein. Manche Schutzbriefe übernehmen einen Teil. Mehr dazu: <a href="/versicherung/">Zahlt die Versicherung?</a> und <a href="/kosten/">Was das Abpumpen kostet</a>.</p>
 """))
 
     P.append(dict(slug="benzin-im-diesel", short="Benzin im Diesel",
@@ -126,12 +128,97 @@ an der nächsten sicheren Stelle anhalten, Motor abstellen, nicht erneut starten
 </ul>
 <p>Transporter, Motorrad oder ein anderes Fahrzeug? Den Preis erfahren Sie ebenfalls direkt am Telefon.</p>
 <h2>Wer die Kosten trägt</h2>
-<p>Meist der Fahrer selbst: Die Kfz-Versicherung zahlt bei einer Falschbetankung in der Regel nicht. Manche Schutzbriefe und Kaskoverträge übernehmen einen Teil. Sie erhalten von uns eine Rechnung, die Sie einreichen können.</p>
+<p>Meist der Fahrer selbst: Die Kfz-Versicherung zahlt bei einer Falschbetankung in der Regel nicht. Manche Schutzbriefe und Kaskoverträge übernehmen einen Teil. Sie erhalten von uns eine Rechnung, die Sie einreichen können. Mehr dazu: <a href="/versicherung/">Zahlt die Versicherung?</a></p>
 <h2>Warum Abpumpen sich lohnt</h2>
 <p>Läuft der Motor mit dem falschen Kraftstoff, kann ein Schaden am Einspritzsystem entstehen, der mehrere tausend Euro kostet. Abpumpen, solange das Gemisch nur im Tank ist, ist dagegen günstig.</p>
 <h2>So bezahlen Sie</h2>
 <p>Direkt vor Ort: bar, per Echtzeit-Überweisung, mit PayPal oder mit Karte (Visa, Mastercard, American Express, Maestro).</p>
 """ % (car, camper)))
+
+    P.append(dict(slug="versicherung", short="Zahlt die Versicherung?",
+        title="Falsch getankt: Zahlt die Versicherung? | {brand}",
+        desc="Haftpflicht, Teilkasko, Vollkasko, Schutzbrief: wer bei Falschbetankung zahlt, was im Vertrag steht und was Sie für die Versicherung festhalten sollten.",
+        h1="Falsch getankt: Zahlt die Versicherung?",
+        lead="Meistens nicht. Ganz ausgeschlossen ist es aber nicht. Entscheidend sind Ihr Vertrag und wie es zur Falschbetankung kam.",
+        body="""
+<h2>Die Versicherungen im Überblick</h2>
+<ul>
+<li><strong>Kfz-Haftpflicht:</strong> Sie zahlt für Schäden, die Sie anderen zufügen, nicht für Ihr eigenes Auto. Für das Abpumpen oder eine Reparatur am eigenen Fahrzeug ist sie in der Regel nicht zuständig.</li>
+<li><strong>Vollkasko:</strong> Viele Bedingungen schließen sogenannte Betriebs- oder Bedienungsschäden aus, und dazu zählt eine Falschbetankung meist. Ein Blick in Ihre Vertragsbedingungen lohnt sich trotzdem.</li>
+<li><strong>Teilkasko:</strong> Das Oberlandesgericht Düsseldorf hat 2008 in einem Einzelfall Teilkasko-Schutz für einen Falschbetankungsschaden zugesprochen (Az. I-4 U 12/08). Daraus folgt kein Anspruch für jeden Vertrag; es kommt auf die Bedingungen an.</li>
+<li><strong>Schutzbrief und Automobilclub:</strong> Je nach Tarif werden Pannenhilfe oder Abschleppen übernommen. Das Abpumpen selbst oder Schäden am Kraftstoffsystem sind damit nicht automatisch abgedeckt. Fragen Sie im Zweifel kurz bei Ihrem Anbieter nach.</li>
+</ul>
+<h2>Wenn die Tankstelle schuld sein könnte</h2>
+<p>Hat Tankstellenpersonal falsch getankt oder war die Zapfsäule falsch beschriftet, kann die Tankstelle haften. Das hängt vom Einzelfall und vom Nachweis ab. Machen Sie deshalb sofort Fotos von Zapfsäule, Zapfpistole und Beschilderung, heben Sie den Kassenbon auf und notieren Sie Zeugen.</p>
+<h2>Was Sie für die Versicherung festhalten sollten</h2>
+<ol>
+<li>Kassenbon mit Kraftstoffsorte und Menge</li>
+<li>Fotos von Zapfsäule und Tankklappe</li>
+<li>ob der Motor gelaufen ist und wie weit Sie gefahren sind</li>
+<li>unsere Rechnung über das Abpumpen</li>
+</ol>
+<p>Wir sind kein Versicherungsberater. Was Ihr Vertrag abdeckt, kann nur Ihre Versicherung verbindlich sagen.</p>
+<p>Mehr dazu: <a href="/kosten/">Was das Abpumpen kostet</a> · <a href="/falsch-getankt/">Was Sie jetzt tun sollten</a></p>
+"""))
+
+    P.append(dict(slug="mietwagen-firmenwagen", short="Mietwagen, Leasing, Firmenwagen",
+        title="Mietwagen oder Firmenwagen falsch getankt? | {brand}",
+        desc="Falsch getankt mit Mietwagen, Leasing- oder Firmenwagen: zuerst Vermieter oder Arbeitgeber anrufen, Motor aus lassen, alles festhalten. So helfen wir danach.",
+        h1="Falsch getankt mit Mietwagen, Leasing- oder Firmenwagen",
+        lead="Das Auto gehört nicht Ihnen. Deshalb gilt neben „Motor aus lassen“ vor allem eins: zuerst den Eigentümer anrufen.",
+        body=first + """
+<h2>So gehen Sie vor</h2>
+<ol>
+<li><strong>Motor aus lassen</strong>, Zündung nicht einschalten.</li>
+<li><strong>Vermieter, Leasinggeber oder Arbeitgeber anrufen.</strong> Viele Vermieter haben eine eigene Pannennummer und schreiben vor, wer das Auto abpumpen darf. Wer ohne Zustimmung selbst einen Dienst beauftragt, verstößt womöglich gegen die Mietbedingungen.</li>
+<li><strong>Alles festhalten:</strong> Kassenbon, Fotos von Zapfsäule und Tankklappe, Uhrzeit, ob der Motor gelaufen ist.</li>
+<li><strong>Erst dann uns beauftragen</strong>, wenn der Vermieter oder Ihr Fuhrpark zustimmt oder Sie selbst entscheiden dürfen.</li>
+</ol>
+<h2>Wer zahlt?</h2>
+<p>Bei einem Mietwagen haftet in der Regel, wer den falschen Kraftstoff getankt hat. Typische Mietbedingungen verpflichten dazu, den richtigen Kraftstoff zu verwenden; eine vereinbarte Haftungsreduzierung kann bei Falschbetankung entfallen. Was genau gilt, steht in Ihrem Mietvertrag. Bei Leasing- und Firmenwagen regeln das der Leasingvertrag oder die Firmenwagenregelung.</p>
+<h2>So helfen wir</h2>
+<p>Wenn Sie uns beauftragen dürfen, pumpen wir vor Ort ab, spülen und füllen richtigen Kraftstoff auf. Sie bekommen eine Rechnung mit allen Angaben, die Vermieter oder Fuhrpark brauchen. Auf Wunsch sprechen wir vorher am Telefon direkt mit Ihrem Fuhrpark.</p>
+<p>Mehr dazu: <a href="/versicherung/">Zahlt die Versicherung?</a> · <a href="/kosten/">Kosten</a></p>
+"""))
+
+    P.append(dict(slug="motorrad", short="Motorrad falsch getankt",
+        title="Motorrad falsch getankt? Abpumpen vor Ort | {brand}",
+        desc="Motorrad falsch getankt, etwa Diesel im Benziner oder E10 ohne Freigabe: Motor aus lassen, nicht weiterfahren. Wir pumpen den Tank vor Ort ab.",
+        h1="Motorrad falsch getankt",
+        lead="Auch am Motorrad passiert es: An vielen Tankstellen passt die Dieselpistole in den Tankstutzen. Dann gilt dasselbe wie beim Auto.",
+        body=first + """
+<h2>Was jetzt wichtig ist</h2>
+<ul>
+<li><strong>Nicht starten.</strong> Motorräder fahren mit Benzin; Diesel verbrennt im Benzinmotor schlecht, der Motor läuft unrund oder geht aus.</li>
+<li><strong>Nicht selbst ablassen.</strong> Benzin ist leicht entzündlich und muss fachgerecht entsorgt werden.</li>
+<li><strong>E10 statt Super?</strong> Unbedenklich, wenn Ihr Motorrad für E10 freigegeben ist. Das steht in den Herstellerangaben. Im Zweifel fragen Sie kurz bei uns nach.</li>
+</ul>
+<h2>So helfen wir</h2>
+<p>Wir kommen zu Ihnen, pumpen den Tank ab, spülen bei Bedarf und füllen richtigen Kraftstoff auf. Sagen Sie uns am Telefon Marke, Modell und wie viel getankt wurde. Den Preis erfahren Sie, bevor wir losfahren.</p>
+<p>Mehr dazu: <a href="/diesel-im-benziner/">Diesel im Benziner</a> · <a href="/falsch-getankt/">alle Sofortmaßnahmen</a></p>
+"""))
+
+    P.append(dict(slug="transporter-lkw", short="Transporter und Lkw",
+        title="Transporter oder Lkw falsch getankt? Abpumpen vor Ort | {brand}",
+        desc="Transporter, Lkw oder Bus falsch getankt, auch AdBlue im Dieseltank: Wir pumpen auch große Tanks vor Ort ab, rund um die Uhr. Preis vorab am Telefon.",
+        h1="Transporter oder Lkw falsch getankt",
+        lead="Bei Nutzfahrzeugen zählt jede Stunde Standzeit. Wir pumpen auch große Tanks direkt vor Ort ab, an der Tankstelle, auf dem Firmenhof oder auf dem Rastplatz.",
+        body=first + """
+<h2>Typische Fälle</h2>
+<ul>
+<li><strong>Benzin im Diesel:</strong> Transporter fahren meist mit Diesel. Schon wenig Benzin kann der Einspritzanlage schaden, wenn der Motor läuft. Mehr dazu: <a href="/benzin-im-diesel/">Benzin im Diesel</a>.</li>
+<li><strong>AdBlue im Dieseltank:</strong> Bei Lkw liegen Diesel- und AdBlue-Stutzen oft nah beieinander. Zündung aus lassen, dann reicht meist eine gründliche Tankreinigung. Mehr dazu: <a href="/adblue-im-dieseltank/">AdBlue im Dieseltank</a>.</li>
+</ul>
+<h2>Was wir am Telefon wissen müssen</h2>
+<ol>
+<li>Fahrzeug und ungefähre Tankgröße</li>
+<li>wie viel falscher Kraftstoff getankt wurde</li>
+<li>ob der Motor oder die Zündung an war</li>
+<li>wo das Fahrzeug steht und ob es dort sicher stehen kann</li>
+</ol>
+<p>Den Preis erfahren Sie, bevor wir losfahren. Sie bekommen eine Rechnung für Ihre Buchhaltung oder Ihren Fuhrpark.</p>
+<p>Mehr dazu: <a href="/mietwagen-firmenwagen/">Firmen- und Leasingfahrzeuge</a> · <a href="/kosten/">Kosten</a></p>
+"""))
 
     regions = [
         dict(key="west", slug="einsatzgebiet/nrw-hessen-rheinland-pfalz", short="NRW, Hessen, Rheinland-Pfalz",

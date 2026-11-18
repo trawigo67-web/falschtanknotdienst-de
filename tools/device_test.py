@@ -1,11 +1,14 @@
 """Gerätetest mit Android- und iPhone-Profilen (Chrome-Engine, Geräteprofile von Playwright).
    Prüft Darstellung, Anruf-Links, Standort-Weiche (simulierte Standorte), Gebietsauswahl und Chat.
-   python3 tools/device_test.py <site-ordner>   (Server: out/ auf :8766)"""
+   python3 tools/device_test.py <site-ordner>   (Server: out/ auf :8766)
+   Mit TEST_URL=http://localhost:PORT/ lässt sich eine Website prüfen, die wie live im Hauptverzeichnis liegt
+   (nötig für die Sprachseiten /en/, /tr/ …, deren Adressen bei der Wurzel beginnen)."""
 import asyncio, sys, json, urllib.parse
 from playwright.async_api import async_playwright
 from PIL import Image
 SITE = sys.argv[1] if len(sys.argv) > 1 else "falschtanknotdienst.de"
-URL = "http://localhost:8766/%s/index.html" % SITE
+import os
+URL = os.environ.get("TEST_URL") or "http://localhost:8766/%s/index.html" % SITE
 DEVICES = [a for a in sys.argv[2:] if a != "-v"] or ["iPhone SE (3rd gen)", "iPhone 13 Mini", "iPhone 15", "iPhone 15 Pro Max", "Galaxy S9+", "Galaxy S24", "Galaxy A55", "Pixel 7"]
 MUC = {"latitude": 48.137, "longitude": 11.575}; FFM = {"latitude": 50.111, "longitude": 8.682}; CGN = {"latitude": 50.938, "longitude": 6.960}; STR = {"latitude": 48.776, "longitude": 9.183}
 fails = []

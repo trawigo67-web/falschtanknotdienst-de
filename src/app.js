@@ -20,6 +20,12 @@
   var LANG_DE = { en: 'Englisch', tr: 'Türkisch', ar: 'Arabisch', ru: 'Russisch', uk: 'Ukrainisch', pl: 'Polnisch', ro: 'Rumänisch', es: 'Spanisch', bg: 'Bulgarisch', fr: 'Französisch', it: 'Italienisch', sq: 'Albanisch', el: 'Griechisch' };
   var packWait = {};
   var lang = 'de';
+  /* Auf der veröffentlichten Website hat jede Sprache eine eigene Adresse (/en/, /tr/ …), damit Google alle Sprachen findet.
+     Diese Seiten sind fertig übersetzt; die Sprachwahl wechselt dann die Adresse. */
+  var LANG_PAGES = !!CFG.langPages;
+  var BASE = LANG_PAGES ? '/' : '';
+  var PAGE_LANG = doc.documentElement.getAttribute('data-page-lang') || 'de';
+  doc.documentElement.dir = RTL[PAGE_LANG] ? 'rtl' : 'ltr';
   /* Deutsch, Englisch und Türkisch stehen in der Seite; die übrigen elf Sprachen werden bei Bedarf nachgeladen */
   function loadPack(l, cb) {
     if (l === 'de' || I18N[l]) { cb(true); return; }
@@ -27,7 +33,7 @@
     packWait[l] = [cb];
     var sc = doc.createElement('script');
     function done(ok) { var cbs = packWait[l]; packWait[l] = null; cbs.forEach(function (f) { f(ok && !!I18N[l] && !!CHAT[l]); }); }
-    sc.src = 'lang/' + l + '.js?v=' + ((CFG.packs && CFG.packs[l]) || '1');
+    sc.src = BASE + 'lang/' + l + '.js?v=' + ((CFG.packs && CFG.packs[l]) || '1');
     sc.async = true;
     sc.onload = function () { done(true); };
     sc.onerror = function () { done(false); };
@@ -165,12 +171,12 @@
     /* Handys halten die Seite bis zu zehn Minuten im Zwischenspeicher. Damit ein im Admin-Bereich
        umgestelltes Farbthema trotzdem sofort ankommt, wird das aktive Thema frisch nachgelesen. */
     if (/[?&]theme=/.test(location.search) || !window.fetch || !/^https?:$/.test(location.protocol)) { return; }
-    fetch('theme.txt', { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+    fetch(BASE + 'theme.txt', { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
       t = t.trim();
       if (!/^[a-z]+$/.test(t) || t === root.getAttribute('data-theme')) { return; }
       root.setAttribute('data-theme', t);
       [].forEach.call(doc.querySelectorAll('link[rel~=icon],link[rel=apple-touch-icon],link[rel=manifest]'), function (l) {
-        l.setAttribute('href', l.getAttribute('href').replace(/^brand\/[a-z]+\//, 'brand/' + t + '/'));
+        l.setAttribute('href', l.getAttribute('href').replace(/^(\/?)brand\/[a-z]+\//, '$1brand/' + t + '/'));
       });
       bar();
     }).catch(function () { /* ohne Netz bleibt das Thema der Seite */ });
@@ -890,7 +896,15 @@
       return;
     }
     var langBtn = target.closest('[data-lang]');
-    if (langBtn) { setLang(langBtn.getAttribute('data-lang'), true); }
+    if (langBtn) {
+      var nl = langBtn.getAttribute('data-lang');
+      if (LANG_PAGES && LANGS.indexOf(nl) >= 0) {
+        e.preventDefault();
+        store.set('lang', nl);
+        if (nl !== PAGE_LANG) { location.href = (nl === 'de' ? '/' : '/' + nl + '/') + location.hash; return; }
+      }
+      setLang(nl, true);
+    }
     if (langBox && langBox.classList.contains('is-open')) {
       langBox.classList.remove('is-open');
       $('.lang-current').setAttribute('aria-expanded', 'false');
@@ -926,7 +940,8 @@
   (function () {
     var saved = store.get('lang');
     var l = 'de';
-    if (LANGS.indexOf(saved) >= 0) { l = saved; }
+    if (PAGE_LANG !== 'de') { l = PAGE_LANG; }
+    else if (LANGS.indexOf(saved) >= 0) { l = saved; }
     else if (!/bot|crawl|spider|lighthouse|headless/i.test(navigator.userAgent || '')) {
       /* erste Sprache aus den Browser-Einstellungen, die es auf dieser Seite gibt */
       var prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'de'];
@@ -954,14 +969,14 @@
   var btn = document.getElementById('vid-play'), img = document.getElementById('vid-poster');
   var wide = window.matchMedia ? window.matchMedia('(min-width: 641px)') : { matches: true };
   function name() { return (document.documentElement.lang === 'tr' ? 'tr' : 'de') + (wide.matches ? '-h' : '-v'); }
-  function poster() { if (img && img.parentNode) { var s = 'video/' + name() + '.jpg'; if (img.getAttribute('src') !== s) { img.setAttribute('src', s); } } }
+  function poster() { if (img && img.parentNode) { var s = (document.documentElement.hasAttribute('data-page-lang') ? '/' : '') + 'video/' + name() + '.jpg'; if (img.getAttribute('src') !== s) { img.setAttribute('src', s); } } }
   poster();
   if (wide.addEventListener) { wide.addEventListener('change', poster); } else if (wide.addListener) { wide.addListener(poster); }
   if (window.MutationObserver) { new MutationObserver(poster).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] }); }
   btn.addEventListener('click', function () {
     var n = name(), v = document.createElement('video');
     v.controls = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto';
-    v.poster = 'video/' + n + '.jpg'; v.src = 'video/' + n + '.mp4';
+    var vb = (document.documentElement.hasAttribute('data-page-lang') ? '/' : ''); v.poster = vb + 'video/' + n + '.jpg'; v.src = vb + 'video/' + n + '.mp4';
     v.setAttribute('aria-labelledby', 'vid-h');
     box.replaceChild(v, btn);
     var pr = v.play(); if (pr && pr.catch) { pr.catch(function () {}); }

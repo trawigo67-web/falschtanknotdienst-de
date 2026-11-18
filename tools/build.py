@@ -37,6 +37,8 @@ def theme_css(themes):
                "--line-strong:color-mix(in srgb,var(--sign-hi) 40%,#59616A);--muted:color-mix(in srgb,var(--sign-muted) 60%,#8E979F);--ink:#EDF1F4}}}")
     return "\n".join(out)
 
+LANG_ORDER = re.findall(r"'([a-z]{2})'", re.search(r"var LANGS = \[([^\]]+)\]", (ROOT / "src/app.js").read_text(encoding="utf-8")).group(1))
+
 def mix(a, b, wa):
     """wie CSS color-mix(in srgb, a wa, b)"""
     ca = [int(a[i:i + 2], 16) for i in (1, 3, 5)]; cb = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
@@ -57,7 +59,7 @@ def build(cfg, mode, out):
     packs = {f.stem: f.read_text(encoding="utf-8") for f in sorted((ROOT / "src/lang").glob("*.js"))}
     stamp = lambda t: hashlib.sha1((t + cfg["domain"] + cfg.get("alias", "") + mode).encode("utf-8")).hexdigest()[:8]
     jscfg = {"regions": cfg["regions"], "soon": cfg.get("soon", {}), "price": cfg["price"], "waText": cfg["waText"],
-             "packs": {k: stamp(t) for k, t in packs.items()}}
+             "packs": {k: stamp(t) for k, t in packs.items()}, "langPages": mode == "site"}
     app = app.replace("/*CFG*/", json.dumps(jscfg, ensure_ascii=False))
     if mode == "site":
         app = re.sub(r"\n\s*window\.__tank = .*?;\n", "\n", app)
@@ -209,6 +211,33 @@ def build(cfg, mode, out):
         if rest:
             sys.exit("Unersetzte Platzhalter im Sprachpaket %s: %s" % (code, rest))
         (out / "lang" / (code + ".js")).write_text(text, encoding="utf-8")
+    # Sprachseiten (/en/, /tr/ …): fertig übersetzt, damit Google jede Sprache findet (nur auf der veröffentlichten Website)
+    if mode == "site":
+        import langpages
+        canon_b = canon if canon.endswith("/") else canon + "/"
+        base_src = i18n
+        for k, v in rep.items():
+            base_src = base_src.replace("{{%s}}" % k, v)
+        pack_out = [(out / "lang" / (c + ".js")).read_text(encoding="utf-8") for c in packs]
+        I = langpages.load_i18n(base_src, pack_out)
+        langs = ["de"] + [l for l in LANG_ORDER if l != "de" and l in I]
+        urls = langpages.lang_urls(canon_b, langs)
+        alt = langpages.hreflang_tags(urls) if canon_b == url else ""
+        names = langpages.lang_names(page)
+        root_page = langpages.footer_links(page)
+        if alt:
+            root_page = re.sub(r'(<link rel="canonical" href="[^"]*">)', lambda m: m.group(1) + "\n" + alt, root_page, count=1)
+        (out / "index.html").write_text(root_page, encoding="utf-8")
+        for l in langs[1:]:
+            lp = langpages.make(root_page, l, I[l], names, urls, urls[l], l == "ar")
+            left = [k for k in re.findall(r'data-i18n="([^"]+)"', page) if k not in I[l]]
+            if left:
+                sys.exit("Sprachseite %s: fehlende Übersetzungen %s" % (l, sorted(set(left))[:8]))
+            (out / l).mkdir(exist_ok=True)
+            (out / l / "index.html").write_text(lp, encoding="utf-8")
+        lang_list = langs[1:]
+    else:
+        lang_list = []
     # Unterseiten (Ratgeber, Kosten, Einsatzgebiete): eigene Adressen mit Inhalt, der ohne JavaScript lesbar ist
     import pages as pagesmod
     base_css = (css.split("/* Karte:")[0]).replace('url("fonts/', 'url("/fonts/') + "\n" + theme_css(themes)
@@ -218,7 +247,7 @@ def build(cfg, mode, out):
         d = out / p["slug"]; d.mkdir(parents=True, exist_ok=True)
         (d / "index.html").write_text(pagesmod.render(cfg, p, base_css, theme, url, canon_base, display, cfg["brandHtml"], plist, tc=(th["paper"], th["paper-dark"])), encoding="utf-8")
     if mode == "site":
-        urls = [url] + [url + p["slug"] + "/" for p in plist]
+        urls = [url] + [url + l + "/" for l in lang_list] + [url + p["slug"] + "/" for p in plist]
         if canon_base == url:
             (out / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n'
                 % "".join("  <url><loc>%s</loc></url>\n" % u for u in urls), encoding="utf-8")
