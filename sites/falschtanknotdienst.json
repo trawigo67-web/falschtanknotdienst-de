@@ -9,5 +9,6 @@
   "title": "Falsch getankt? Tank abpumpen vor Ort, 24/7 | Falschtank-Notdienst",
   "alias": "tankdoktor.de",
   "video": true,
-  "mark": "zapf"
+  "mark": "zapf",
+  "canonical": "https://tankdoktor.de/"
 }

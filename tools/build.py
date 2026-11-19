@@ -108,7 +108,7 @@ def build(cfg, mode, out):
     ld = [{
         "@context": "https://schema.org", "@type": "AutomotiveBusiness",
         "name": display, "description": "Mobiler Abpumpservice bei Falschbetankung: Benzin im Diesel, Diesel im Benziner, AdBlue.",
-        "url": url, "telephone": cfg["regions"]["west"]["tel"], "priceRange": "ab %s €" % cfg["price"]["car"],
+        "url": canon, "telephone": cfg["regions"]["west"]["tel"], "priceRange": "ab %s €" % cfg["price"]["car"],
         "logo": url + "brand/%s/icon-512.png" % theme, "image": url + "brand/%s/og.png" % theme,
         "address": {"@type": "PostalAddress", "streetAddress": cfg["street"], "postalCode": cfg["city"].split(" ")[0],
                     "addressLocality": cfg["city"].split(" ", 1)[1], "addressCountry": "DE"},
